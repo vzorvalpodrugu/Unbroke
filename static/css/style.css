@@ -1,6 +1,6 @@
 body {
     min-height: 100vh;
-    background: linear-gradient(135deg, #8e2de2, #ff6a88, #43cea2);
+    background: linear-gradient(135deg, #6a10b1, #ff6a88, #10c2f3);
     background-size: 300% 300%;
     animation: gradientBG 12s ease infinite;
     color: white;

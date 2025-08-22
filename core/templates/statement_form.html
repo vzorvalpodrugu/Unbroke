@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="d-flex justify-content-center align-items-center" style="height: 90vh;">
+    <div class="p-5 shadow-lg"
+         style="background: rgba(10, 31, 68, 0.95); border: 2px solid black; border-radius: 20px; width: 480px;">
+        
+        <h3 class="text-center text-light mb-4 fw-bold">Введите данные</h3>
+        
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <!-- Выбор банка -->
+            <div class="mb-4">
+				<label class="form-label text-light fw-semibold">Выберите банк</label>
+				<div class="dropdown">
+					<button class="btn btn-dark w-100 dropdown-toggle d-flex align-items-center" type="button" id="bankDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+						<img id="selectedBankIcon" src="{% static 'icons/tbank.png' %}" class="me-2" style="width:24px; height:24px;">
+						<span id="selectedBankText">Tbank</span>
+					</button>
+					<ul class="dropdown-menu w-100" aria-labelledby="bankDropdown">
+						<li><a class="dropdown-item d-flex align-items-center" data-value="Tbank" href="#"><img src="{% static 'icons/tbank.png' %}" class="me-2" style="width:24px; height:24px;">Tbank</a></li>
+						<li><a class="dropdown-item d-flex align-items-center" data-value="Sberbank" href="#"><img src="{% static 'icons/sberbank.png' %}" class="me-2" style="width:24px; height:24px;">Sberbank</a></li>
+						<li><a class="dropdown-item d-flex align-items-center" data-value="AlphaBank" href="#"><img src="{% static 'icons/alphabank.png' %}" class="me-2" style="width:24px; height:24px;">AlphaBank</a></li>
+						<li><a class="dropdown-item d-flex align-items-center" data-value="VTB" href="#"><img src="{% static 'icons/vtb.png' %}" class="me-2" style="width:24px; height:24px;">VTB</a></li>
+						<li><a class="dropdown-item d-flex align-items-center" data-value="Gazprombank" href="#"><img src="{% static 'icons/gazprombank.png' %}" class="me-2" style="width:24px; height:24px;">Gazprombank</a></li>
+					</ul>
+					<input type="hidden" name="bank" id="bankInput" value="Tbank">
+				</div>
+			</div>
+
+            
+            <!-- Загрузка файла -->
+            <div class="mb-4">
+                <label class="form-label text-light fw-semibold">Загрузите выписку</label>
+                {{ form.file }}
+            </div>
+            
+            <!-- Кнопка -->
+            <button type="submit" class="btn btn-gradient w-100 py-2 fw-bold">
+                🚀 Анализ
+            </button>
+        </form>
+    </div>
+</div>
+
+<style>
+    /* Поля */
+    select, input[type="file"] {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid #444;
+        border-radius: 12px;
+        color: #fff;
+        padding: 10px 12px;
+        width: 100%;
+        transition: all 0.3s ease-in-out;
+    }
+
+    select:focus, input[type="file"]:focus {
+        box-shadow: 0 0 10px rgba(0, 123, 255, 0.6);
+        border-color: #007bff;
+    }
+
+    /* Кнопка */
+    .btn-gradient {
+        background: linear-gradient(135deg, #00b09b, #96c93d);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        transition: transform 0.2s ease-in-out;
+    }
+
+    .btn-gradient:hover {
+        transform: scale(1.05);
+        background: linear-gradient(135deg, #00c9a7, #a1ff7a);
+    }
+
+    select option[data-icon] {
+        padding-left: 30px;
+        background-repeat: no-repeat;
+        background-size: 20px 20px;
+        background-position: left center;
+    }
+
+    select option[value="Tbank"] { background-image: url("{% static 'icons/tbank.png' %}"); }
+    select option[value="Sberbank"] { background-image: url("{% static 'icons/sberbank.png' %}"); }
+    select option[value="AlphaBank"] { background-image: url("{% static 'icons/alphabank.png' %}"); }
+    select option[value="VTB"] { background-image: url("{% static 'icons/vtb.png' %}"); }
+    select option[value="Gazprombank"] { background-image: url("{% static 'icons/gazprombank.png' %}"); }
+	
+	.dropdown-toggle {
+		background: rgba(255,255,255,0.1);
+		border: 1px solid #444;
+		border-radius: 12px;
+		color: #fff;
+		padding: 10px 12px;
+		transition: all 0.3s ease-in-out;
+		display: flex;
+		align-items: center;
+	}
+	
+	.dropdown-toggle:focus {
+		box-shadow: 0 0 10px rgba(0,123,255,0.6);
+		border-color: #007bff;
+	}
+</style>
+
+<script>
+	document.querySelectorAll('.dropdown-item').forEach(item => {
+    item.addEventListener('click', function(e){
+        e.preventDefault();
+        const value = this.getAttribute('data-value');
+        const text = this.innerText;
+        const img = this.querySelector('img').getAttribute('src');
+
+        document.getElementById('selectedBankText').innerText = text;
+        document.getElementById('selectedBankIcon').src = img;
+        document.getElementById('bankInput').value = value;
+    });
+});
+
+</script>
+{% endblock %}
