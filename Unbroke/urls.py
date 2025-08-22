@@ -1,6 +1,6 @@
 
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from core.views import (
     LandingView
 )
@@ -8,4 +8,5 @@ from core.views import (
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', LandingView.as_view(), name='landing'),
+    path("", include("users.urls")),
 ]
