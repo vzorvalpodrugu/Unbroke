@@ -10,7 +10,7 @@
       <div class="mb-3">
         {{ field }}
         {% if field.errors %}
-          <div class="text-danger small mt-1">
+          <div class="invalid-feedback d-block">
             {{ field.errors|striptags }}
           </div>
         {% endif %}
