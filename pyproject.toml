@@ -1,13 +1,13 @@
 [tool.poetry]
-name = "transactionchecker"
+name = "Unbroke"
 version = "0.1.0"
 description = "description"
 authors = ["vzorvalpodrugu Starkov8904@yandex.ru"]
 
 [tool.poetry.dependencies]
 python = "^3.13"
-django = "^5.2.5"
 python-dotenv = "^1.1.1"
+django = "^5.2.5"
 
 
 [build-system]
