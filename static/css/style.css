@@ -1,0 +1,48 @@
+body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #8e2de2, #ff6a88, #43cea2);
+    background-size: 300% 300%;
+    animation: gradientBG 12s ease infinite;
+    color: white;
+}
+
+@keyframes gradientBG {
+    0% {background-position: 0% 50%;}
+    50% {background-position: 100% 50%;}
+    100% {background-position: 0% 50%;}
+}
+
+.glass-input {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(0, 0, 0, 0.6);
+    border-radius: 12px;
+    padding: 10px 15px;
+    color: white;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.glass-input:focus {
+    outline: none;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+    border-color: #fff;
+}
+
+.invalid-feedback {
+    font-size: 0.95rem;        /* чуть больше стандартного */
+    font-weight: 500;          /* полужирный */
+    color: #ffdddd !important; /* светло-красный для читаемости на фоне */
+    text-shadow: 0 0 4px rgba(0, 0, 0, 0.6); /* чтобы текст был отчётливым */
+    margin-top: 6px;
+    padding-left: 4px;
+}
+
+.is-invalid {
+    border: 2px solid #ff4d4d !important;  /* более заметная рамка */
+    box-shadow: 0 0 8px rgba(255, 77, 77, 0.6) !important;
+}
+
+form .errorlist {
+    display: none; /* убираем дефолтные списки ошибок */
+}
+
