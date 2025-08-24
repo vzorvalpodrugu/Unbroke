@@ -1,8 +1,11 @@
 from pathlib import Path
-
+from dotenv import load_dotenv
+import os
 from django.conf.global_settings import STATICFILES_DIRS
 from django.contrib.messages import constants as messages
 
+load_dotenv()
+MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY")
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-bh#^nwa3@ap^06*4ijc$kk1z%yua6sc!3a%!5@cbhv7)j!*3s_'
