@@ -5,7 +5,7 @@ import json
 from mistralai import Mistral
 from pdf2image import convert_from_bytes
 from django.conf import settings
-from promts.PROMT_MANY_TRANS import PROMT
+from promts.ONLY_CATEGOREIS import PROMT
 
 promt = PROMT
 CATEGORY_RULES = {
