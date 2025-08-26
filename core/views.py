@@ -14,7 +14,7 @@ class StatementCreateView(CreateView):
     model = Statement
     form_class = StatementForm
     template_name = "statement_form.html"
-    success_url = reverse_lazy("landing")
+    success_url = reverse_lazy("statement_upload")
 
     def form_valid(self, form):
         form.instance.user = self.request.user
