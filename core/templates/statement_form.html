@@ -574,15 +574,26 @@ function trackProgress(taskId) {
 
             // Завершение анализа
             if (p.done) {
-                clearInterval(interval);
-                if (spinner) spinner.style.display = "none";
-                if (statusText) {
-                    statusText.textContent = "Готовим ответ для Вас!";
-                    setTimeout(() => {
-                        statusText.textContent = "✅ Анализ завершен!";
-                    }, 1000);
-                }
-            }
+				clearInterval(interval);
+				if (spinner) spinner.style.display = "none";
+				
+				if (p.has_advice && p.advice) {
+					// Показываем рекомендации
+					statusText.textContent = "✅ Анализ завершен!";
+					
+					// Здесь можно отобразить рекомендации
+					console.log("Рекомендация:", p.advice);
+					console.log("Лучший банк:", p.top_bank);
+					console.log("Кешбэк:", p.top_cashback);
+					
+					// Например, перенаправить на страницу с результатами
+					setTimeout(() => {
+						window.location.href = `/results/?task_id=${taskId}`;
+					}, 2000);
+				} else {
+					statusText.textContent = "✅ Анализ завершен!";
+				}
+			}
         })
         .catch(err => console.error("Ошибка получения прогресса:", err));
     }, 1000);

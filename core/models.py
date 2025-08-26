@@ -7,8 +7,17 @@ class Bank(models.Model):
     food_cashback = models.FloatField(default=0.0)        # % кешбэка на еду
     transport_cashback = models.FloatField(default=0.0)   # % кешбэка на транспорт
     clothes_cashback = models.FloatField(default=0.0)     # % кешбэка на одежду
+    transaction_cashback = models.FloatField(default=0.0)   # % кешбэка на платежи
+    pharmacy_cashback = models.FloatField(default=0.0)  # % кешбэка на аптеку
+    music_cashback = models.FloatField(default=0.0) # % кешбэка на музыку
+    art_cashback = models.FloatField(default=0.0)   # % кешбэка на искусство
+    hotel_cashback = models.FloatField(default=0.0) # % кешбэка на отели
+    gas_station_cashback = models.FloatField(default=0.0)   # % кешбэка на заправки
     percent_on_balance = models.FloatField(default=0.0)  # % на остаток
     deposit_percent = models.FloatField(default=0.0)     # % на вклад
+
+
+
 
     def __str__(self):
         return self.bank_name

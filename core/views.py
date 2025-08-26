@@ -8,6 +8,7 @@ from .mistral import process_llm
 from django.core.cache import cache
 import uuid
 from django.http import JsonResponse
+# from mistral_advice import
 
 
 
@@ -56,4 +57,14 @@ class StatementCreateView(CreateView):
 # эндпоинт для фронта
 def get_progress(request, task_id):
     progress = cache.get(f"progress:{task_id}", {})
+
+    # Добавляем проверку на завершение и наличие рекомендаций
+    if progress.get('done') and 'advice_result' in progress:
+        return JsonResponse({
+            **progress,
+            'has_advice': True,
+            'advice': progress['advice_result'].get('advice', ''),
+            'top_bank': progress['advice_result'].get('top_bank', ''),
+            'top_cashback': progress['advice_result'].get('top_cashback', 0)
+        })
     return JsonResponse(progress)

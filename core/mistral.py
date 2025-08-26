@@ -8,6 +8,7 @@ from mistralai import Mistral
 from pdf2image import convert_from_bytes
 from django.conf import settings
 from promts.ONLY_CATEGOREIS import PROMT
+from core.mistral_advice import generate_bank_advice
 
 PROMPT = PROMT
 CATEGORIES = [
@@ -130,9 +131,13 @@ def process_llm(file_field, bank: str = None, task_id: str = "default"):
                 {"type": "image_url", "image_url": base64_img},
             ]
         }]
-
+        # Models
+        # Pixtral 12B (pixtral-12b-latest)
+        # Pixtral Large (pixtral-large-latest) - пока лучшая
+        # Mistral Medium 2505(mistral-medium-latest)
+        # Mistral Small 2503(mistral-small-latest)
         try:
-            resp = client.chat.complete(model="pixtral-large-latest",
+            resp = client.chat.complete(model="mistral-small-latest",
                                         messages=messages)
             raw = resp.choices[0].message.content
             print(f"📄 Ответ страницы {idx}: {raw}")
@@ -164,14 +169,27 @@ def process_llm(file_field, bank: str = None, task_id: str = "default"):
 
     # Финальный прогресс
     final_categories = agg.result()
+
+    # Генерация рекомендации
+    progress = cache.get(f"progress:{task_id}")
+    progress["logs"].append("🎯 Анализируем лучший банк для ваших трат...")
+    cache.set(f"progress:{task_id}", progress, timeout=3600)
+
+    # Запускаем генерацию рекомендаций
+    advice_result = generate_bank_advice(final_categories, task_id)
+
     progress = cache.get(f"progress:{task_id}")
     progress["logs"].append("Формируем финальный JSON...")
     progress["logs"].append("✅ Анализ завершен!")
     progress["done"] = True
     progress["pages_done"] = done_pages
-    cache.set(f"progress:{task_id}", progress, timeout=3600)
+    progress["final_categories"] = final_categories
+    progress["advice_result"] = advice_result
 
+    cache.set(f"progress:{task_id}", progress, timeout=3600)
+    print(final_categories)
     return {
         "страницы": all_responses,
-        "итог": final_categories
+        "итог": final_categories,
+        "рекомендации": advice_result
     }
