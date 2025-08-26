@@ -77,33 +77,49 @@
 </div>
 <!-- Блок прогресса -->
 <div id="analysisProgress" class="d-flex justify-content-center align-items-center vh-100 d-none">
-    <div class="card shadow-lg p-5 text-center position-relative"
-         style="background-color:#0d1b2a; border:1px solid #000; border-radius:20px; width:550px;">
+    <div class="card shadow-lg p-5 text-center position-relative progress-card-dark"
+         style="background: linear-gradient(135deg, #0d1b2a 0%, #1b3a4b 100%); border:1px solid #1e3a5f; border-radius:20px; width:550px;">
 
-        <!-- Текущий статус страницы -->
-        <div id="statusText" class="mb-3 text-light" style="min-height:28px; font-size:18px;"></div>
+        <!-- Заголовок -->
+        <div class="progress-header mb-4">
+            <h4 class="text-light mb-1">Анализ выписки</h4>
+            <p class="text-primary" style="color: #4cc9f0 !important;">Обрабатываем данные...</p>
+        </div>
 
-        <!-- Контейнер для завершённых страниц -->
-        <div id="completedPages" class="text-start mb-4"></div>
+        <!-- Прогресс-бар -->
+        <div class="progress-container mb-4">
+            <div class="progress-bar-custom">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-percent text-light mt-2" id="progressPercent">0%</div>
+        </div>
 
-        <!-- Крутящийся кружок -->
-        <div class="d-flex justify-content-end">
+        <!-- Текущий статус -->
+        <div class="status-container mb-4">
+            <div class="status-indicator">
+                <div class="status-pulse"></div>
+            </div>
+            <div id="statusText" class="status-text text-light">Подготовка к анализу</div>
+        </div>
+
+        <!-- Завершенные страницы -->
+        <div class="pages-section">
+            <div class="pages-header d-flex justify-content-between align-items-center mb-3">
+                <span class="text-light">Обработанные страницы</span>
+                <span class="text-primary" id="pagesCount" style="color: #4cc9f0 !important;">0/0</span>
+            </div>
+            <div id="completedPages" class="pages-list"></div>
+        </div>
+
+        <!-- Спиннер -->
+        <div class="spinner-container">
             <div class="spinner">
                 <div class="spinner-circle"></div>
             </div>
         </div>
-
     </div>
 </div>
 
-
-        <!-- Лог шагов -->
-        <div id="progressLog" class="text-light small text-start"
-             style="font-family:monospace; background:#152a44; border-radius:12px; padding:12px; height:140px; overflow:auto;">
-            ▶ Ожидание запуска...
-        </div>
-    </div>
-</div>
 
 <style>
 /* Dropdown styles */
@@ -262,61 +278,207 @@
     80% { transform: scale(1.1); opacity: 1; }
     100% { transform: scale(1); opacity: 1; }
 }
-/* Крутящийся кружок */
-.spinner {
-    width: 60px;
-    height: 60px;
-    margin-left: 10px;
+/* Стили для прогресс-карточки */
+.progress-card-dark {
+    background: linear-gradient(135deg, #0d1b2a 0%, #1b3a4b 100%) !important;
+    border: 1px solid #1e3a5f !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;
+}
+
+.progress-header h4 {
+    font-weight: 600;
+    font-size: 1.5rem;
+}
+
+/* Прогресс-бар */
+.progress-bar-custom {
+    width: 100%;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4361ee, #4cc9f0);
+    border-radius: 10px;
+    width: 0%;
+    transition: width 0.5s ease;
+    box-shadow: 0 0 10px rgba(76, 201, 240, 0.4);
+}
+
+.progress-percent {
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+/* Индикатор статуса */
+.status-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    border: 1px solid rgba(76, 201, 240, 0.2);
+}
+
+.status-indicator {
     position: relative;
 }
-.spinner-circle {
-    width: 100%;
-    height: 100%;
-    border: 6px solid rgba(0,191,255,0.2);
-    border-top-color: #00bfff;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
 
-/* Галочка зелёная с анимацией сдвига */
+.status-pulse {
+    width: 12px;
+    height: 12px;
+    background: #4cc9f0;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(76, 201, 240, 0.7);
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(76, 201, 240, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(76, 201, 240, 0);
+        transform: scale(1);
+    }
+}
+
+.status-text {
+    font-weight: 500;
+    font-size: 1rem;
+}
+
+/* Секция страниц */
+.pages-section {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    padding: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 20px;
+}
+
+.pages-header {
+    font-weight: 600;
+}
+
+/* Список страниц в столбик */
+.pages-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 200px;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+.pages-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.pages-list::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+}
+
+.pages-list::-webkit-scrollbar-thumb {
+    background: #4cc9f0;
+    border-radius: 3px;
+}
+
+/* Стили для завершенных страниц */
 .completed-page {
     display: flex;
     align-items: center;
-    margin-bottom: 6px;
-    opacity: 0;
-    transform: translateX(-50px); /* начальное смещение влево */
-    transition: all 0.5s ease;
-    color: #fff; /* белый текст */
-    font-size: 18px; /* увеличенный размер */
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    color: #fff;
+    font-size: 16px;
     font-weight: 500;
+    animation: slideIn 0.4s ease;
+    transition: all 0.3s ease;
 }
 
-.completed-page.visible {
-    opacity: 1;
-    transform: translateX(0); /* плавное появление */
-}
-.completed-page svg {
-    width: 20px;
-    height: 20px;
-    margin-right: 8px;
-    stroke: #28a745;
-    stroke-width: 4;
-    fill: none;
-    stroke-linecap: round;
-    stroke-linejoin: round;
+.completed-page:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateX(5px);
 }
 
-/* Статус текст */
-#statusText {
-    font-size: 20px;
-    color: #00bfff;
-    font-weight: 500;
-    min-height: 28px; /* чтобы текст не прыгал */
+.page-number {
+    font-weight: 600;
 }
-#completedPages {
-    transition: all 1.5s ease; /* плавное изменение размера контейнера */
+
+/* Большая зеленая галочка */
+.page-checkmark {
+    width: 24px;
+    height: 24px;
+    color: #28a745;
+    animation: checkmarkPop 0.5s ease;
 }
+
+@keyframes checkmarkPop {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Контейнер спиннера */
+.spinner-container {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+}
+
+.spinner-circle {
+    width: 100%;
+    height: 100%;
+    border: 3px solid rgba(76, 201, 240, 0.2);
+    border-top: 3px solid #4cc9f0;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
 
 </style>
 
@@ -345,60 +507,88 @@ document.addEventListener("DOMContentLoaded", function() {
             setTimeout(() => {
                 progressCard.classList.remove("d-none");
                 progressCard.scrollIntoView({ behavior: "smooth", block: "center" });
+                
+                // 🔥 ВЫЗЫВАЕМ ФУНКЦИЮ ОТСЛЕЖИВАНИЯ ПРОГРЕССА
+                trackProgress(taskId);
+                
             }, 500);
 
-            let lastPage = 0;
-
-            const interval = setInterval(() => {
-                fetch(`/progress/${taskId}/`)
-                .then(r => r.json())
-                .then(p => {
-                    console.log("Прогресс с сервера:", p); // 🔹 дебаг
-
-                    if (!statusText) return;
-
-                    // Обновляем текущий статус
-                    if (p.current && p.total && p.current > lastPage) {
-                        statusText.textContent = `Анализ страницы ${p.current}...`;
-                    }
-
-                    // Добавляем новые завершённые страницы с анимацией
-                    if (p.pages_done && Array.isArray(p.pages_done)) {
-						p.pages_done.forEach(pageNum => {
-							// 🔹 проверяем реально ли элемент уже есть
-							if (!document.getElementById(`page-${pageNum}`)) {
-								const div = document.createElement("div");
-								div.id = `page-${pageNum}`;
-								div.className = "completed-page";
-								div.innerHTML = `<svg viewBox="0 0 52 52">
-									<path d="M14 27l7 7 16-16"/>
-								</svg> Страница ${pageNum}`;
-								completedContainer.appendChild(div);
-					
-								// 🔹 двойной requestAnimationFrame для плавного сдвига
-								requestAnimationFrame(() => {
-									requestAnimationFrame(() => div.classList.add("visible"));
-								});
-							}
-						});
-					}
-
-                    // Когда всё завершено
-                    if (p.done) {
-                        clearInterval(interval);
-                        spinner.style.display = "none";
-                        statusText.textContent = "Готовим ответ для Вас!";
-                        setTimeout(() => {
-                            statusText.textContent = "✅ Анализ завершен!";
-                        }, 1000);
-                    }
-                })
-                .catch(err => console.error("Ошибка fetch прогресса:", err));
-            }, 1000);
+            // Удаляем старый интервал отслеживания прогресса
+            // (переносим логику в функцию trackProgress)
         })
         .catch(err => console.error("Ошибка submit формы:", err));
     });
 
+    // Обновленная функция отслеживания прогресса
+// Обновленная функция отслеживания прогресса
+function trackProgress(taskId) {
+    let lastPage = 0;
+    let totalPages = 0;
+
+    const interval = setInterval(() => {
+        fetch(`/progress/${taskId}/`)
+        .then(r => r.json())
+        .then(p => {
+            console.log("Прогресс с сервера:", p);
+
+            // Обновляем прогресс-бар
+            if (p.current && p.total) {
+                totalPages = p.total;
+                const progress = (p.current / p.total) * 100;
+                document.getElementById('progressFill').style.width = `${progress}%`;
+                document.getElementById('progressPercent').textContent = `${Math.round(progress)}%`;
+                document.getElementById('pagesCount').textContent = `${p.current}/${p.total}`;
+                
+                // Обновляем статус текста
+                if (statusText) {
+                    statusText.textContent = `Анализ страницы ${p.current}...`;
+                }
+            }
+
+            // Обновляем статус из ответа сервера (если есть)
+            if (p.status && statusText) {
+                statusText.textContent = p.status;
+            }
+
+            // Добавляем завершенные страницы
+            if (p.pages_done && Array.isArray(p.pages_done)) {
+                p.pages_done.forEach(pageNum => {
+                    if (!document.getElementById(`page-${pageNum}`)) {
+                        const div = document.createElement("div");
+                        div.id = `page-${pageNum}`;
+                        div.className = "completed-page";
+                        div.innerHTML = `
+                            <span class="page-number">Страница ${pageNum}</span>
+                            <i class="bi bi-check-circle-fill page-checkmark"></i>
+                        `;
+                        completedContainer.appendChild(div);
+                        
+                        // Плавное появление
+                        setTimeout(() => {
+                            div.style.opacity = "1";
+                            div.style.transform = "translateY(0)";
+                        }, 50);
+                    }
+                });
+            }
+
+            // Завершение анализа
+            if (p.done) {
+                clearInterval(interval);
+                if (spinner) spinner.style.display = "none";
+                if (statusText) {
+                    statusText.textContent = "Готовим ответ для Вас!";
+                    setTimeout(() => {
+                        statusText.textContent = "✅ Анализ завершен!";
+                    }, 1000);
+                }
+            }
+        })
+        .catch(err => console.error("Ошибка получения прогресса:", err));
+    }, 1000);
+}
+
+    // Остальной код (банковский dropdown, upload box) остается без изменений
     // Банковский dropdown
     const bankBtn = document.getElementById('bankDropdownBtn');
     const bankDropdown = document.querySelector('.bank-dropdown');
