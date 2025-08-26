@@ -62,7 +62,46 @@
                     Анализ
                 </button>
             </div>
+			
         </form>
+    </div>
+	<div id="formSuccessOverlay" class="d-none">
+    <div class="checkmark-container">
+        <div class="checkmark-circle">
+            <svg viewBox="0 0 52 52">
+                <path d="M14 27l7 7 16-16" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </div>
+    </div>
+</div>
+</div>
+<!-- Блок прогресса -->
+<div id="analysisProgress" class="d-flex justify-content-center align-items-center vh-100 d-none">
+    <div class="card shadow-lg p-5 text-center position-relative"
+         style="background-color:#0d1b2a; border:1px solid #000; border-radius:20px; width:550px;">
+
+        <!-- Текущий статус страницы -->
+        <div id="statusText" class="mb-3 text-light" style="min-height:28px; font-size:18px;"></div>
+
+        <!-- Контейнер для завершённых страниц -->
+        <div id="completedPages" class="text-start mb-4"></div>
+
+        <!-- Крутящийся кружок -->
+        <div class="d-flex justify-content-end">
+            <div class="spinner">
+                <div class="spinner-circle"></div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+        <!-- Лог шагов -->
+        <div id="progressLog" class="text-light small text-start"
+             style="font-family:monospace; background:#152a44; border-radius:12px; padding:12px; height:140px; overflow:auto;">
+            ▶ Ожидание запуска...
+        </div>
     </div>
 </div>
 
@@ -156,10 +195,209 @@
 #fileCheck {
     transition: all 0.5s ease-in-out;
 }
+/* Круглый прогресс */
+.progress-circle {
+    position: relative;
+    width: 160px;
+    height: 160px;
+}
+.progress-ring__circle {
+    stroke-dasharray: 427; /* 2πr при r=68 */
+    stroke-dashoffset: 427;
+    transform: rotate(-90deg);
+    transform-origin: 50% 50%;
+    transition: stroke-dashoffset 0.5s ease;
+}
+.progress-ring__circle-bg {
+    opacity: 0.2;
+}
+.progress-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 22px;
+}
+/*Для зеленой кнопки*/
+#statementForm.dimmed {
+    opacity: 0.5;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+}
+
+#formSuccessOverlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+}
+
+.checkmark-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Галочка */
+.checkmark-circle {
+    width: 160px;   /* было 80px → увеличили в 2 раза */
+    height: 160px;
+    border-radius: 50%;
+    background: #28a745; /* ярко-зелёный */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation: popIn 0.5s ease forwards;
+    box-shadow: 0 0 20px rgba(40, 167, 69, 0.7); /* сияние */
+}
+
+.checkmark-circle svg {
+    width: 80px;   /* в 2 раза больше */
+    height: 80px;
+}
+
+@keyframes popIn {
+    0% { transform: scale(0); opacity: 0; }
+    80% { transform: scale(1.1); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+}
+/* Крутящийся кружок */
+.spinner {
+    width: 60px;
+    height: 60px;
+    margin-left: 10px;
+    position: relative;
+}
+.spinner-circle {
+    width: 100%;
+    height: 100%;
+    border: 6px solid rgba(0,191,255,0.2);
+    border-top-color: #00bfff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Галочка зелёная с анимацией сдвига */
+.completed-page {
+    display: flex;
+    align-items: center;
+    margin-bottom: 6px;
+    opacity: 0;
+    transform: translateX(-50px); /* начальное смещение влево */
+    transition: all 0.5s ease;
+    color: #fff; /* белый текст */
+    font-size: 18px; /* увеличенный размер */
+    font-weight: 500;
+}
+
+.completed-page.visible {
+    opacity: 1;
+    transform: translateX(0); /* плавное появление */
+}
+.completed-page svg {
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+    stroke: #28a745;
+    stroke-width: 4;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* Статус текст */
+#statusText {
+    font-size: 20px;
+    color: #00bfff;
+    font-weight: 500;
+    min-height: 28px; /* чтобы текст не прыгал */
+}
+#completedPages {
+    transition: all 1.5s ease; /* плавное изменение размера контейнера */
+}
+
 </style>
 
 <script>
-document.addEventListener("DOMContentLoaded", function(){
+document.addEventListener("DOMContentLoaded", function() {
+    const form = document.getElementById("statementForm");
+    const progressCard = document.getElementById("analysisProgress");
+    const completedContainer = document.getElementById("completedPages");
+    const spinner = document.querySelector(".spinner-circle");
+    const formSuccessOverlay = document.getElementById("formSuccessOverlay");
+    const statusText = document.getElementById("statusText");
+
+    form.addEventListener("submit", function(e) {
+        e.preventDefault();
+        const formData = new FormData(form);
+
+        fetch("{% url 'statement_upload' %}", { method: "POST", body: formData })
+        .then(r => r.json())
+        .then(data => {
+            const taskId = data.task_id;
+
+            // Затемняем форму и показываем белую галочку
+            form.classList.add("dimmed");
+            formSuccessOverlay.classList.remove("d-none");
+
+            setTimeout(() => {
+                progressCard.classList.remove("d-none");
+                progressCard.scrollIntoView({ behavior: "smooth", block: "center" });
+            }, 500);
+
+            let lastPage = 0;
+
+            const interval = setInterval(() => {
+                fetch(`/progress/${taskId}/`)
+                .then(r => r.json())
+                .then(p => {
+                    console.log("Прогресс с сервера:", p); // 🔹 дебаг
+
+                    if (!statusText) return;
+
+                    // Обновляем текущий статус
+                    if (p.current && p.total && p.current > lastPage) {
+                        statusText.textContent = `Анализ страницы ${p.current}...`;
+                    }
+
+                    // Добавляем новые завершённые страницы с анимацией
+                    if (p.pages_done && Array.isArray(p.pages_done)) {
+						p.pages_done.forEach(pageNum => {
+							// 🔹 проверяем реально ли элемент уже есть
+							if (!document.getElementById(`page-${pageNum}`)) {
+								const div = document.createElement("div");
+								div.id = `page-${pageNum}`;
+								div.className = "completed-page";
+								div.innerHTML = `<svg viewBox="0 0 52 52">
+									<path d="M14 27l7 7 16-16"/>
+								</svg> Страница ${pageNum}`;
+								completedContainer.appendChild(div);
+					
+								// 🔹 двойной requestAnimationFrame для плавного сдвига
+								requestAnimationFrame(() => {
+									requestAnimationFrame(() => div.classList.add("visible"));
+								});
+							}
+						});
+					}
+
+                    // Когда всё завершено
+                    if (p.done) {
+                        clearInterval(interval);
+                        spinner.style.display = "none";
+                        statusText.textContent = "Готовим ответ для Вас!";
+                        setTimeout(() => {
+                            statusText.textContent = "✅ Анализ завершен!";
+                        }, 1000);
+                    }
+                })
+                .catch(err => console.error("Ошибка fetch прогресса:", err));
+            }, 1000);
+        })
+        .catch(err => console.error("Ошибка submit формы:", err));
+    });
 
     // Банковский dropdown
     const bankBtn = document.getElementById('bankDropdownBtn');
@@ -178,16 +416,13 @@ document.addEventListener("DOMContentLoaded", function(){
             const value = option.getAttribute('data-value');
             const text = option.innerText.trim();
             const img = option.querySelector('img').getAttribute('src');
-
             bankInput.value = value;
             selectedBankText.innerText = text;
             selectedBankIcon.src = img;
-
             bankDropdown.classList.remove('show');
         });
     });
 
-    // Закрытие dropdown при клике вне
     document.addEventListener('click', (e) => {
         if(!bankBtn.contains(e.target) && !bankDropdown.contains(e.target)) {
             bankDropdown.classList.remove('show');
@@ -199,7 +434,6 @@ document.addEventListener("DOMContentLoaded", function(){
         const fileInput = box.querySelector('.file-input');
         const uploadText = box.querySelector('.upload-text');
         const fileCheck = box.querySelector('#fileCheck');
-
         let clickLock = false;
 
         box.addEventListener('click', e => {
@@ -224,7 +458,9 @@ document.addEventListener("DOMContentLoaded", function(){
             }
         });
     });
-
 });
 </script>
+
+
+
 {% endblock %}
