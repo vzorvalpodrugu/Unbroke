@@ -4,7 +4,8 @@ from django.urls import path, include
 from core.views import (
     LandingView,
     StatementCreateView,
-    get_progress
+    get_progress,
+    generate_advice
 )
 
 urlpatterns = [
@@ -13,4 +14,5 @@ urlpatterns = [
     path("", include("users.urls")),
     path("upload/", StatementCreateView.as_view(), name="statement_upload"),
     path("progress/<str:task_id>/", get_progress, name="get_progress"),
+    path('generate_advice/<str:task_id>/', generate_advice, name='generate_advice'),
 ]

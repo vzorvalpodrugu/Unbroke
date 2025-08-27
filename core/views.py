@@ -2,6 +2,8 @@
 import threading
 from django.views.generic import TemplateView, CreateView
 from django.urls import reverse_lazy
+
+from .mistral_advice import generate_bank_advice
 from .models import Statement
 from .forms import StatementForm
 from .mistral import process_llm
@@ -68,3 +70,25 @@ def get_progress(request, task_id):
             'top_cashback': progress['advice_result'].get('top_cashback', 0)
         })
     return JsonResponse(progress)
+
+
+def generate_advice(request, task_id):
+    """Отдельный endpoint для генерации рекомендаций"""
+    try:
+        progress = cache.get(f"progress:{task_id}", {})
+        categories = progress.get("final_categories", {})
+
+        if not categories:
+            return JsonResponse({"error": "Данные анализа не найдены"})
+
+        # Генерируем рекомендации
+        advice_result = generate_bank_advice(categories, task_id)
+
+        # Обновляем прогресс с результатами
+        progress["advice_result"] = advice_result
+        cache.set(f"progress:{task_id}", progress, timeout=3600)
+
+        return JsonResponse(advice_result)
+
+    except Exception as e:
+        return JsonResponse({"error": str(e)})

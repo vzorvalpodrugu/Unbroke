@@ -167,29 +167,45 @@ def process_llm(file_field, bank: str = None, task_id: str = "default"):
         progress["pages_done"] = done_pages.copy()
         cache.set(f"progress:{task_id}", progress, timeout=3600)
 
-    # Финальный прогресс
+        # Финальный прогресс
     final_categories = agg.result()
 
-    # Генерация рекомендации
-    progress = cache.get(f"progress:{task_id}")
-    progress["logs"].append("🎯 Анализируем лучший банк для ваших трат...")
-    cache.set(f"progress:{task_id}", progress, timeout=3600)
+    # Запускаем генерацию рекомендаций в ОТДЕЛЬНОМ ПОТОКЕ
+    def run_advice_generation():
+        try:
+            progress = cache.get(f"progress:{task_id}")
+            progress["logs"].append("🎯 Запускаем анализ лучшего банка...")
+            cache.set(f"progress:{task_id}", progress, timeout=3600)
 
-    # Запускаем генерацию рекомендаций
-    advice_result = generate_bank_advice(final_categories, task_id)
+            advice_result = generate_bank_advice(final_categories, task_id)
 
+            progress = cache.get(f"progress:{task_id}")
+            progress["advice_result"] = advice_result
+            progress["logs"].append("✅ Рекомендации готовы!")
+            cache.set(f"progress:{task_id}", progress, timeout=3600)
+
+        except Exception as e:
+            progress = cache.get(f"progress:{task_id}")
+            progress["logs"].append(f"❌ Ошибка генерации рекомендаций: {e}")
+            cache.set(f"progress:{task_id}", progress, timeout=3600)
+
+    # Запускаем в отдельном потоке
+    import threading
+    advice_thread = threading.Thread(target=run_advice_generation)
+    advice_thread.daemon = True
+    advice_thread.start()
+
+    # Завершаем основной процесс
     progress = cache.get(f"progress:{task_id}")
-    progress["logs"].append("Формируем финальный JSON...")
-    progress["logs"].append("✅ Анализ завершен!")
+    progress["logs"].append("✅ Анализ страниц завершен!")
     progress["done"] = True
     progress["pages_done"] = done_pages
     progress["final_categories"] = final_categories
-    progress["advice_result"] = advice_result
 
     cache.set(f"progress:{task_id}", progress, timeout=3600)
     print(final_categories)
+
     return {
         "страницы": all_responses,
         "итог": final_categories,
-        "рекомендации": advice_result
     }
