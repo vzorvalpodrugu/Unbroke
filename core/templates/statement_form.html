@@ -3,7 +3,7 @@
 
 {% block content %}
 <div class="d-flex justify-content-center align-items-center vh-100" id="start_block">
-    <div class="card shadow-lg p-5"
+    <div class="card shadow-lg p-5" id="firstFormCard"
          style="background-color:#0d1b2a; border:1px solid #000; border-radius:20px; width:550px;">
 
         <form method="post" enctype="multipart/form-data" id="statementForm">
@@ -557,11 +557,18 @@
     transform: translate(-50%, -50%);
     font-size: 22px;
 }
-/*Для зеленой кнопки*/
-#statementForm.dimmed {
-    opacity: 0.5;
+/*!*Для зеленой кнопки*!*/
+/*#statementForm.dimmed {*/
+/*    opacity: 0.5;*/
+/*    pointer-events: none;*/
+/*    transition: opacity 0.5s ease;*/
+/*}*/
+#start_block.dimmed #firstFormCard {
+    opacity: 0.3 !important;
+    filter: blur(2px) !important;
+    background: rgba(0,0,0,0.5) !important;
     pointer-events: none;
-    transition: opacity 0.5s ease;
+    transition: all 0.5s ease;
 }
 
 #formSuccessOverlay {
@@ -814,6 +821,7 @@
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     const form = document.getElementById("statementForm");
+    const startBlock = document.getElementById("start_block");
     const progressCard = document.getElementById("analysisProgress");
     const completedContainer = document.getElementById("completedPages");
     const spinner = document.querySelector(".spinner-circle");
@@ -829,14 +837,14 @@ document.addEventListener("DOMContentLoaded", function() {
             .then(data => {
                 const taskId = data.task_id;
 
-                form.classList.add("dimmed");
+                startBlock.classList.add("dimmed");
                 formSuccessOverlay.classList.remove("d-none");
 
                 setTimeout(() => {
                     progressCard.classList.remove("d-none");
                     progressCard.scrollIntoView({ behavior: "smooth", block: "center" });
                     trackProgress(taskId);
-                }, 500);
+                }, 1500);
             })
             .catch(err => console.error("Ошибка submit формы:", err));
     });
