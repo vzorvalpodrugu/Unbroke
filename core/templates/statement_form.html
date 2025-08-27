@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block content %}
-<div class="d-flex justify-content-center align-items-center vh-100">
+<div class="d-flex justify-content-center align-items-center vh-100" id="start_block">
     <div class="card shadow-lg p-5"
          style="background-color:#0d1b2a; border:1px solid #000; border-radius:20px; width:550px;">
 
@@ -118,10 +118,333 @@
             </div>
         </div>
     </div>
+	<!-- Зеленая галочка для перехода от прогресса к результатам -->
+	<div id="progressToResultsOverlay" class="d-none">
+		<div class="checkmark-container">
+			<div class="checkmark-circle-green">
+				<svg viewBox="0 0 52 52">
+					<path d="M14 27l7 7 16-16" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+				</svg>
+			</div>
+		</div>
+	</div>
 </div>
 
 
+<!-- Блок результатов -->
+<div id="resultsSection" class="d-flex justify-content-center align-items-center vh-100 d-none">
+    <div class="card shadow-lg p-5 text-center position-relative results-card-dark"
+         style="background: linear-gradient(135deg, #0d1b2a 0%, #1b3a4b 100%); border:1px solid #1e3a5f; border-radius:20px; width:600px;">
+
+        <!-- Заголовок -->
+        <div class="results-header mb-4">
+            <h4 class="text-light mb-1">Результаты анализа</h4>
+            <p class="text-primary" style="color: #4cc9f0 !important;">Ваши траты и рекомендации</p>
+        </div>
+
+        <!-- Общая сумма расходов -->
+        <div class="total-spending mb-4">
+            <div class="total-amount text-light">
+                <i class="bi bi-wallet2 me-2"></i>
+                Общая сумма расходов:
+                <span id="totalAmount" class="fw-bold" style="color: #4cc9f0 !important;">0 руб.</span>
+            </div>
+        </div>
+
+        <!-- Категории расходов -->
+        <div class="categories-section mb-4">
+            <div class="categories-header d-flex justify-content-between align-items-center mb-3">
+                <span class="text-light">Расходы по категориям</span>
+                <i class="bi bi-pie-chart text-primary" style="color: #4cc9f0 !important;"></i>
+            </div>
+            <div id="categoriesList" class="categories-list"></div>
+        </div>
+
+        <!-- Рекомендация -->
+        <div class="advice-section">
+            <div class="advice-header d-flex justify-content-between align-items-center mb-3">
+                <span class="text-light">Рекомендация</span>
+                <i class="bi bi-lightbulb text-warning"></i>
+            </div>
+            <div id="adviceContent" class="advice-content">
+                <div class="loading-advice text-light">
+                    <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
+                    Формируем рекомендации...
+                </div>
+            </div>
+        </div>
+
+        <!-- Кнопка назад -->
+        <div class="text-center mt-4">
+            <button onclick="location.reload()" class="btn btn-outline-light px-4 py-2">
+                <i class="bi bi-arrow-left me-2"></i>Новый анализ
+            </button>
+        </div>
+    </div>
+	
+</div>
+
+
+
 <style>
+	/* Галочка для перехода от прогресса к результатам */
+#progressToResultsOverlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10000;
+    pointer-events: none;
+}
+.checkmark-circle-green {
+	width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: #28a745;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation: popIn 0.6s ease forwards;
+    box-shadow: 0 0 30px rgba(40, 167, 69, 0.8);
+}
+
+.checkmark-circle-green svg {
+    width: 90px;
+    height: 90px;
+}
+
+
+/* Плавное появление результатов */
+#resultsSection {
+    opacity: 0;
+    transform: translateY(50px);
+    transition: all 0.8s ease;
+    position: relative;
+    z-index: 1000;
+}
+
+#resultsSection.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+#analysisProgress {
+    position: relative;
+}
+
+
+	#resultsSection {
+     opacity: 0;
+    transform: translateY(50px);
+    transition: all 0.8s ease;
+    position: relative;
+    z-index: 1000;
+}
+
+#resultsSection.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Дополнительные стили для галочки на форме прогресса */
+.checkmark-circle {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: #28a745;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation: popIn 0.6s ease forwards;
+    box-shadow: 0 0 30px rgba(40, 167, 69, 0.8);
+}
+
+@keyframes popIn {
+    0% {
+        transform: scale(0) translate(-50%, -50%);
+        opacity: 0;
+    }
+    70% {
+        transform: scale(1.1) translate(-50%, -50%);
+    }
+    100% {
+        transform: scale(1) translate(-50%, -50%);
+        opacity: 1;
+    }
+}
+
+
+/* Плавное появление результатов */
+#resultsSection {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s ease;
+}
+
+#resultsSection.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+	/* Стили для карточки результатов */
+.results-card-dark {
+   background: linear-gradient(135deg, #0d1b2a 0%, #1b3a4b 100%) !important;
+    border: 1px solid #1e3a5f !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;
+}
+
+.results-header h4 {
+    font-weight: 600;
+    font-size: 1.5rem;
+}
+
+/* Общая сумма */
+.total-spending {
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    border: 1px solid rgba(76, 201, 240, 0.2);
+}
+
+.total-amount {
+    font-size: 1.2rem;
+    font-weight: 500;
+}
+
+/* Секция категорий */
+.categories-section {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    padding: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.categories-header {
+    font-weight: 600;
+}
+
+.categories-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 200px;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+.categories-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.categories-list::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+}
+
+.categories-list::-webkit-scrollbar-thumb {
+    background: #4cc9f0;
+    border-radius: 3px;
+}
+
+/* Элементы категорий */
+.category-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: #fff;
+    font-size: 14px;
+    animation: slideIn 0.4s ease;
+    transition: all 0.3s ease;
+}
+
+.category-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateX(3px);
+}
+
+.category-name {
+    font-weight: 500;
+}
+
+.category-amount {
+    font-weight: 600;
+    color: #4cc9f0;
+}
+
+/* Секция рекомендаций */
+.advice-section {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    padding: 16px;
+    border: 1px solid rgba(255, 193, 7, 0.3);
+}
+
+.advice-header {
+    font-weight: 600;
+}
+
+.advice-content {
+    background: rgba(255, 193, 7, 0.1);
+    border-radius: 8px;
+    padding: 16px;
+    color: #fff;
+    font-size: 14px;
+    line-height: 1.5;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.advice-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.advice-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+}
+
+.advice-content::-webkit-scrollbar-thumb {
+    background: #ffc107;
+    border-radius: 3px;
+}
+
+.loading-advice {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+/* Анимации */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Адаптивность */
+@media (max-width: 576px) {
+    .results-card-dark {
+        width: 90% !important;
+        padding: 1.5rem !important;
+    }
+    
+    .total-amount {
+        font-size: 1rem;
+    }
+    
+    .category-item {
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+}
 /* Dropdown styles */
 .bank-select {
     background: rgba(255,255,255,0.1);
@@ -284,7 +607,13 @@
     border: 1px solid #1e3a5f !important;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;
 }
-
+#analysisProgress.dimmed .progress-card-dark {
+    opacity: 0.3 !important;
+    filter: blur(2px) !important;
+    background: rgba(0,0,0,0.5) !important; /* Добавим затемнение фона для проверки */
+    pointer-events: none;
+    transition: all 0.5s ease;
+}
 .progress-header h4 {
     font-weight: 600;
     font-size: 1.5rem;
@@ -496,110 +825,22 @@ document.addEventListener("DOMContentLoaded", function() {
         const formData = new FormData(form);
 
         fetch("{% url 'statement_upload' %}", { method: "POST", body: formData })
-        .then(r => r.json())
-        .then(data => {
-            const taskId = data.task_id;
+            .then(r => r.json())
+            .then(data => {
+                const taskId = data.task_id;
 
-            // Затемняем форму и показываем белую галочку
-            form.classList.add("dimmed");
-            formSuccessOverlay.classList.remove("d-none");
+                form.classList.add("dimmed");
+                formSuccessOverlay.classList.remove("d-none");
 
-            setTimeout(() => {
-                progressCard.classList.remove("d-none");
-                progressCard.scrollIntoView({ behavior: "smooth", block: "center" });
-                
-                // 🔥 ВЫЗЫВАЕМ ФУНКЦИЮ ОТСЛЕЖИВАНИЯ ПРОГРЕССА
-                trackProgress(taskId);
-                
-            }, 500);
-
-            // Удаляем старый интервал отслеживания прогресса
-            // (переносим логику в функцию trackProgress)
-        })
-        .catch(err => console.error("Ошибка submit формы:", err));
+                setTimeout(() => {
+                    progressCard.classList.remove("d-none");
+                    progressCard.scrollIntoView({ behavior: "smooth", block: "center" });
+                    trackProgress(taskId);
+                }, 500);
+            })
+            .catch(err => console.error("Ошибка submit формы:", err));
     });
 
-    // Обновленная функция отслеживания прогресса
-// Обновленная функция отслеживания прогресса
-function trackProgress(taskId) {
-    let lastPage = 0;
-    let totalPages = 0;
-
-    const interval = setInterval(() => {
-        fetch(`/progress/${taskId}/`)
-        .then(r => r.json())
-        .then(p => {
-            console.log("Прогресс с сервера:", p);
-
-            // Обновляем прогресс-бар
-            if (p.current && p.total) {
-                totalPages = p.total;
-                const progress = (p.current / p.total) * 100;
-                document.getElementById('progressFill').style.width = `${progress}%`;
-                document.getElementById('progressPercent').textContent = `${Math.round(progress)}%`;
-                document.getElementById('pagesCount').textContent = `${p.current}/${p.total}`;
-                
-                // Обновляем статус текста
-                if (statusText) {
-                    statusText.textContent = `Анализ страницы ${p.current}...`;
-                }
-            }
-
-            // Обновляем статус из ответа сервера (если есть)
-            if (p.status && statusText) {
-                statusText.textContent = p.status;
-            }
-
-            // Добавляем завершенные страницы
-            if (p.pages_done && Array.isArray(p.pages_done)) {
-                p.pages_done.forEach(pageNum => {
-                    if (!document.getElementById(`page-${pageNum}`)) {
-                        const div = document.createElement("div");
-                        div.id = `page-${pageNum}`;
-                        div.className = "completed-page";
-                        div.innerHTML = `
-                            <span class="page-number">Страница ${pageNum}</span>
-                            <i class="bi bi-check-circle-fill page-checkmark"></i>
-                        `;
-                        completedContainer.appendChild(div);
-                        
-                        // Плавное появление
-                        setTimeout(() => {
-                            div.style.opacity = "1";
-                            div.style.transform = "translateY(0)";
-                        }, 50);
-                    }
-                });
-            }
-
-            // Завершение анализа
-            if (p.done) {
-				clearInterval(interval);
-				if (spinner) spinner.style.display = "none";
-				
-				if (p.has_advice && p.advice) {
-					// Показываем рекомендации
-					statusText.textContent = "✅ Анализ завершен!";
-					
-					// Здесь можно отобразить рекомендации
-					console.log("Рекомендация:", p.advice);
-					console.log("Лучший банк:", p.top_bank);
-					console.log("Кешбэк:", p.top_cashback);
-					
-					// Например, перенаправить на страницу с результатами
-					setTimeout(() => {
-						window.location.href = `/results/?task_id=${taskId}`;
-					}, 2000);
-				} else {
-					statusText.textContent = "✅ Анализ завершен!";
-				}
-			}
-        })
-        .catch(err => console.error("Ошибка получения прогресса:", err));
-    }, 1000);
-}
-
-    // Остальной код (банковский dropdown, upload box) остается без изменений
     // Банковский dropdown
     const bankBtn = document.getElementById('bankDropdownBtn');
     const bankDropdown = document.querySelector('.bank-dropdown');
@@ -635,19 +876,14 @@ function trackProgress(taskId) {
         const fileInput = box.querySelector('.file-input');
         const uploadText = box.querySelector('.upload-text');
         const fileCheck = box.querySelector('#fileCheck');
-        let clickLock = false;
 
         box.addEventListener('click', e => {
-            if (!clickLock) {
-                clickLock = true;
-                fileInput.click();
-            }
+            fileInput.click();
         });
 
         fileInput.addEventListener('click', e => e.stopPropagation());
 
         fileInput.addEventListener('change', () => {
-            clickLock = false;
             if (fileInput.files.length > 0) {
                 uploadText.textContent = fileInput.files[0].name;
                 fileCheck.classList.remove('d-none');
@@ -660,8 +896,187 @@ function trackProgress(taskId) {
         });
     });
 });
+
+// =======================
+// Функции вне DOMContentLoaded
+// =======================
+
+function trackProgress(taskId) {
+    const progressFillEl = document.getElementById('progressFill');
+    const progressPercentEl = document.getElementById('progressPercent');
+    const pagesCountEl = document.getElementById('pagesCount');
+    const statusTextEl = document.getElementById('statusText');
+    const completedContainer = document.getElementById('completedPages');
+    const spinnerCircle = document.querySelector('.spinner-circle');
+
+    const analysisProgress = document.getElementById("analysisProgress");
+    const progressToResultsOverlay = document.getElementById("progressToResultsOverlay");
+    const resultsSection = document.getElementById("resultsSection");
+
+    const interval = setInterval(() => {
+        fetch(`/progress/${taskId}/`)
+            .then(r => r.json())
+            .then(p => {
+                console.log("Прогресс:", p);
+
+                // Обновляем прогресс
+                if (p.current && p.total) {
+                    const progress = (p.current / p.total) * 100;
+                    progressFillEl.style.width = `${progress}%`;
+                    progressPercentEl.textContent = `${Math.round(progress)}%`;
+                    pagesCountEl.textContent = `${p.current}/${p.total}`;
+                    if (statusTextEl) statusTextEl.textContent = `Анализ страницы ${p.current}...`;
+                }
+
+                // Добавляем завершённые страницы
+                if (p.pages_done && Array.isArray(p.pages_done)) {
+                    p.pages_done.forEach(pageNum => {
+                        if (!document.getElementById(`page-${pageNum}`)) {
+                            const div = document.createElement("div");
+                            div.id = `page-${pageNum}`;
+                            div.className = "completed-page";
+                            div.innerHTML = `
+                                <span class="page-number">Страница ${pageNum}</span>
+                                <i class="bi bi-check-circle-fill page-checkmark"></i>
+                            `;
+                            completedContainer.appendChild(div);
+                        }
+                    });
+                }
+
+                // Завершено → переходим к результатам
+                if (p.done && p.final_categories) {
+                    clearInterval(interval);
+
+                    if (spinnerCircle) spinnerCircle.style.display = "none";
+                    if (statusTextEl) statusTextEl.textContent = "✅ Анализ завершен!";
+
+                    // 1) Затемняем карточку прогресса
+                    analysisProgress.classList.add("dimmed");
+
+                    // 2) Показываем зеленую галочку в центре второй формы
+                    progressToResultsOverlay.classList.remove("d-none");
+
+                    // 3) Через 1.5 секунды показываем блок результатов
+                    setTimeout(() => {
+                        // Показываем результаты
+                        showResults(p);
+                        
+                        // Запускаем мониторинг готовности рекомендаций
+                        monitorAdviceProgress(taskId);
+                        
+                        // Галочка остается на месте как индикатор успеха
+                    }, 1500);
+                }
+            })
+            .catch(err => {
+                console.error("Ошибка получения прогресса:", err);
+            });
+    }, 1000);
+}
+
+function showResults(progressData) {
+    const resultsSection = document.getElementById('resultsSection');
+    const analysisProgress = document.getElementById("analysisProgress");
+    
+    // Показываем блок результатов
+    resultsSection.classList.remove('d-none');
+
+    // Заполняем категории и суммы
+    if (progressData.final_categories) {
+        displayCategories(progressData.final_categories);
+    }
+
+    // Плавное появление
+    requestAnimationFrame(() => {
+        resultsSection.classList.add('show');
+        
+        // Плавный скролл к результатам
+        setTimeout(() => {
+            resultsSection.scrollIntoView({
+                behavior: "smooth",
+                block: "center"
+            });
+        }, 100);
+    });
+}
+function monitorAdviceProgress(taskId) {
+    const adviceContent = document.getElementById('adviceContent');
+    const adviceInterval = setInterval(() => {
+        fetch(`/progress/${taskId}/`)
+            .then(r => r.json())
+            .then(p => {
+                if (p.advice_result) {
+                    clearInterval(adviceInterval);
+                    if (p.advice_result.advice) {
+                        displayAdvice(p.advice_result.advice);
+                    } else {
+                        adviceContent.innerHTML = '<div class="text-warning">Рекомендации не сгенерированы</div>';
+                    }
+                } else if (p.logs && p.logs.some(log => log.includes('Ошибка') || log.includes('❌'))) {
+                    clearInterval(adviceInterval);
+                    adviceContent.innerHTML = '<div class="text-warning">Не удалось сгенерировать рекомендации</div>';
+                }
+            })
+            .catch(err => {
+                console.error("Ошибка проверки рекомендаций:", err);
+            });
+    }, 2000);
+}
+
+function generateAdvice(taskId) {
+    const adviceContent = document.getElementById('adviceContent');
+    
+    fetch(`/generate_advice/${taskId}/`)
+        .then(r => r.json())
+        .then(data => {
+            if (data.advice) {
+                displayAdvice(data.advice);
+            } else if (data.error) {
+                adviceContent.innerHTML = `<div class="text-warning">Ошибка генерации рекомендаций: ${data.error}</div>`;
+            }
+        })
+        .catch(err => {
+            adviceContent.innerHTML = `<div class="text-warning">Ошибка: ${err.message}</div>`;
+        });
+}
+
+
+
+function displayCategories(categories) {
+    const categoriesList = document.getElementById('categoriesList');
+    const totalAmount = document.getElementById('totalAmount');
+    
+    let total = 0;
+    categoriesList.innerHTML = '';
+    
+    Object.entries(categories).forEach(([category, amount]) => {
+        if (amount > 0) {
+            total += amount;
+            const div = document.createElement('div');
+            div.className = 'category-item';
+            div.innerHTML = `
+                <span class="category-name">${category}</span>
+                <span class="category-amount">${amount.toLocaleString('ru-RU')} руб.</span>
+            `;
+            categoriesList.appendChild(div);
+        }
+    });
+    
+    totalAmount.textContent = `${total.toLocaleString('ru-RU')} руб.`;
+}
+
+function displayAdvice(adviceText) {
+    const adviceContent = document.getElementById('adviceContent');
+    adviceContent.innerHTML = `<div class="advice-text">${formatAdviceText(adviceText)}</div>`;
+}
+
+function formatAdviceText(text) {
+    return text
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        .replace(/\n/g, '<br>')
+        .replace(/^- (.*?)(<br>|$)/g, '• $1<br>');
+}
 </script>
-
-
-
 {% endblock %}
