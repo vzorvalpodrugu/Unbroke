@@ -131,62 +131,256 @@
 </div>
 
 
-<!-- Блок результатов -->
-<div id="resultsSection" class="d-flex justify-content-center align-items-center vh-100 d-none">
-    <div class="card shadow-lg p-5 text-center position-relative results-card-dark"
-         style="background: linear-gradient(135deg, #0d1b2a 0%, #1b3a4b 100%); border:1px solid #1e3a5f; border-radius:20px; width:600px;">
+<!-- Блок результатов и советов -->
+<div id="resultsContainer" class="results-container d-none">
+<div class="d-flex justify-content-center align-items-center vh-100">
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <!-- Блок результатов (слева) -->
+            <div class="col-md-6 mb-4" id="resultsSection">
+                <div class="card shadow-lg p-5 text-center position-relative results-card-dark"
+                     style="background: linear-gradient(135deg, #0d1b2a 0%, #1b3a4b 100%); border:1px solid #1e3a5f; border-radius:20px; height: 100%;">
 
-        <!-- Заголовок -->
-        <div class="results-header mb-4">
-            <h4 class="text-light mb-1">Результаты анализа</h4>
-            <p class="text-primary" style="color: #4cc9f0 !important;">Ваши траты и рекомендации</p>
-        </div>
+                    <!-- Заголовок -->
+                    <div class="results-header mb-4">
+                        <h4 class="text-light mb-1">Результаты анализа</h4>
+                        <p class="text-primary" style="color: #4cc9f0 !important;">Ваши траты по категориям</p>
+                    </div>
 
-        <!-- Общая сумма расходов -->
-        <div class="total-spending mb-4">
-            <div class="total-amount text-light">
-                <i class="bi bi-wallet2 me-2"></i>
-                Общая сумма расходов:
-                <span id="totalAmount" class="fw-bold" style="color: #4cc9f0 !important;">0 руб.</span>
+                    <!-- Общая сумма расходов -->
+                    <div class="total-spending mb-4">
+                        <div class="total-amount text-light">
+                            <i class="bi bi-wallet2 me-2"></i>
+                            Общая сумма расходов:
+                            <span id="totalAmount" class="fw-bold" style="color: #4cc9f0 !important;">0 руб.</span>
+                        </div>
+                    </div>
+
+                    <!-- Категории расходов -->
+                    <div class="categories-section mb-4">
+                        <div class="categories-header d-flex justify-content-between align-items-center mb-3">
+                            <span class="text-light">Расходы по категориям</span>
+                            <i class="bi bi-pie-chart text-primary" style="color: #4cc9f0 !important;"></i>
+                        </div>
+                        <div id="categoriesList" class="categories-list"></div>
+                    </div>
+
+                    <!-- Кнопка назад -->
+                    <div class="text-center mt-4">
+                        <button onclick="location.reload()" class="btn btn-outline-light px-4 py-2">
+                            <i class="bi bi-arrow-left me-2"></i>Новый анализ
+                        </button>
+                    </div>
+                </div>
             </div>
-        </div>
 
-        <!-- Категории расходов -->
-        <div class="categories-section mb-4">
-            <div class="categories-header d-flex justify-content-between align-items-center mb-3">
-                <span class="text-light">Расходы по категориям</span>
-                <i class="bi bi-pie-chart text-primary" style="color: #4cc9f0 !important;"></i>
-            </div>
-            <div id="categoriesList" class="categories-list"></div>
-        </div>
+            <!-- Блок советов (справа) -->
+            <div class="col-md-6 mb-4" id="adviceSection">
+                <div class="card shadow-lg p-5 text-center position-relative advice-card-dark"
+                     style="background: linear-gradient(135deg, #0d1b2a 0%, #1b3a4b 100%); border:1px solid #1e3a5f; border-radius:20px; height: 100%;">
 
-        <!-- Рекомендация -->
-        <div class="advice-section">
-            <div class="advice-header d-flex justify-content-between align-items-center mb-3">
-                <span class="text-light">Рекомендация</span>
-                <i class="bi bi-lightbulb text-warning"></i>
-            </div>
-            <div id="adviceContent" class="advice-content">
-                <div class="loading-advice text-light">
-                    <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
-                    Формируем рекомендации...
+                    <!-- Заголовок -->
+                    <div class="advice-header mb-4">
+                        <h4 class="text-light mb-1">Персональные рекомендации</h4>
+                        <p class="text-warning">Лучший банк для ваших трат</p>
+                    </div>
+
+                    <!-- Банк с максимальным кешбэком -->
+                    <div class="top-bank-section mb-4">
+                        <div class="top-bank-card p-3 mb-3" style="background: rgba(76, 201, 240, 0.1); border-radius: 12px;">
+                            <div class="top-bank-header d-flex justify-content-between align-items-center mb-2">
+                                <span class="text-light">🚀 Лучший банк</span>
+                                <i class="bi bi-trophy-fill text-warning"></i>
+                            </div>
+                            <div id="topBankName" class="fw-bold fs-5 text-light">Загрузка...</div>
+                            <div id="topCashbackAmount" class="text-success fw-semibold">0 руб. кешбэка</div>
+                        </div>
+                    </div>
+
+                    <!-- Рекомендация -->
+                    <div class="advice-content-section">
+                        <div class="advice-content-header d-flex justify-content-between align-items-center mb-3">
+                            <span class="text-light">Финансовые рекомендации</span>
+                            <i class="bi bi-lightbulb text-warning"></i>
+                        </div>
+                        <div id="adviceContent" class="advice-content-text">
+                            <div class="loading-advice text-light">
+                                <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
+                                Анализируем ваши траты...
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Дополнительная информация -->
+                    <div class="additional-info mt-4">
+                        <div class="text-center">
+                            <small class="text-muted">Рекомендации сгенерированы на основе анализа ваших расходов</small>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-
-        <!-- Кнопка назад -->
-        <div class="text-center mt-4">
-            <button onclick="location.reload()" class="btn btn-outline-light px-4 py-2">
-                <i class="bi bi-arrow-left me-2"></i>Новый анализ
-            </button>
-        </div>
     </div>
-	
+</div>
 </div>
 
 
 
 <style>
+	body {
+    overflow-x: hidden;
+}
+/*	#resultsContainer {*/
+/*    width: 100%;*/
+/*}*/
+.results-container {
+    opacity: 0;
+    transform: translateY(50px);
+    transition: all 0.8s ease;
+    position: relative;
+    z-index: 1000;
+}
+
+.results-container.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.results-container:not(.d-none) {
+    display: block !important;
+}
+
+.results-container.d-none {
+    display: none !important;
+    opacity: 0;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+/* Исправляем анимации */
+#resultsContainer {
+	display: block;
+    opacity: 0;
+    transform: translateY(50px);
+    transition: all 0.8s ease;
+}
+
+#resultsContainer.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+#resultsContainer.d-none {
+    display: none !important;
+}
+#resultsSection, #adviceSection {
+    opacity: 0;
+    transform: translateX(-30px);
+    transition: all 0.8s ease 0.3s; /* Задержка для последовательной анимации */
+}
+
+/* Гарантируем, что row не создает горизонтальный скролл */
+.row {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.col-lg-6 {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+/*-------------------------------------------------------*/
+	
+	.advice-card-dark {
+    background: linear-gradient(135deg, #0d1b2a 0%, #1b3a4b 100%) !important;
+    border: 1px solid rgba(255, 193, 7, 0.3) !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;
+}
+
+.advice-header h4 {
+    font-weight: 600;
+    font-size: 1.5rem;
+}
+
+/* Контент рекомендаций */
+.advice-content-text {
+    background: rgba(255, 193, 7, 0.1);
+    border-radius: 12px;
+    padding: 20px;
+    color: #fff;
+    font-size: 14px;
+    line-height: 1.6;
+    max-height: 300px;
+    overflow-y: auto;
+    text-align: left;
+}
+
+.advice-content-text::-webkit-scrollbar {
+    width: 6px;
+}
+
+.advice-content-text::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+}
+
+.advice-content-text::-webkit-scrollbar-thumb {
+    background: #ffc107;
+    border-radius: 3px;
+}
+
+.advice-content-text strong {
+    color: #ffc107;
+}
+
+.advice-content-text em {
+    color: #4cc9f0;
+}
+
+.advice-content-text ul {
+    padding-left: 20px;
+    margin-bottom: 0;
+}
+
+.advice-content-text li {
+    margin-bottom: 8px;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .container-fluid {
+        padding: 0 15px;
+    }
+    
+    .results-card-dark,
+    .advice-card-dark {
+        margin-bottom: 20px;
+    }
+}
+
+/* Анимации для появления */
+#resultsSection, #adviceSection {
+    opacity: 0;
+    transform: translateX(-30px);
+    transition: all 0.8s ease;
+}
+
+#resultsSection.show, #adviceSection.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+#adviceSection {
+    transform: translateX(30px);
+}
+
+#adviceSection.show {
+    transform: translateX(0);
+}
+/*----------------------------------------------------*/
 	/* Галочка для перехода от прогресса к результатам */
 #progressToResultsOverlay {
     position: absolute;
@@ -954,60 +1148,92 @@ function trackProgress(taskId) {
 
                 // Завершено → переходим к результатам
                 if (p.done && p.final_categories) {
-                    clearInterval(interval);
-
-                    if (spinnerCircle) spinnerCircle.style.display = "none";
-                    if (statusTextEl) statusTextEl.textContent = "✅ Анализ завершен!";
-
-                    // 1) Затемняем карточку прогресса
-                    analysisProgress.classList.add("dimmed");
-
-                    // 2) Показываем зеленую галочку в центре второй формы
-                    progressToResultsOverlay.classList.remove("d-none");
-
-                    // 3) Через 1.5 секунды показываем блок результатов
-                    setTimeout(() => {
-                        // Показываем результаты
-                        showResults(p);
-                        
-                        // Запускаем мониторинг готовности рекомендаций
-                        monitorAdviceProgress(taskId);
-                        
-                        // Галочка остается на месте как индикатор успеха
-                    }, 1500);
-                }
+					clearInterval(interval);
+				
+					if (spinnerCircle) spinnerCircle.style.display = "none";
+					if (statusTextEl) statusTextEl.textContent = "✅ Анализ завершен!";
+				
+					// 1) Затемняем карточку прогресса
+					analysisProgress.classList.add("dimmed");
+				
+					// 2) Показываем зеленую галочку в центре второй формы
+					progressToResultsOverlay.classList.remove("d-none");
+				
+					// 3) Через 1.5 секунды показываем блок результатов
+					setTimeout(() => {
+						// Показываем результаты
+						showResults(p);
+						
+						// Запускаем мониторинг готовности рекомендаций
+						monitorAdviceProgress(taskId);
+					}, 1500);
+				}
             })
             .catch(err => {
                 console.error("Ошибка получения прогресса:", err);
             });
     }, 1000);
 }
-
+function forceReflow(element) {
+    return element.offsetHeight;
+}
 function showResults(progressData) {
+    console.log("showResults called");
+    const resultsContainer = document.getElementById('resultsContainer');
     const resultsSection = document.getElementById('resultsSection');
-    const analysisProgress = document.getElementById("analysisProgress");
+    const adviceSection = document.getElementById('adviceSection');
     
-    // Показываем блок результатов
-    resultsSection.classList.remove('d-none');
-
-    // Заполняем категории и суммы
+    // Убираем класс d-none и добавляем show
+    resultsContainer.classList.remove('d-none');
+    
+    // Заполняем категории
     if (progressData.final_categories) {
         displayCategories(progressData.final_categories);
     }
-
-    // Плавное появление
-    requestAnimationFrame(() => {
-        resultsSection.classList.add('show');
+    
+    // Даем время для применения изменений DOM
+    setTimeout(() => {
+        resultsContainer.classList.add('show');
         
-        // Плавный скролл к результатам
+        // Анимируем внутренние блоки с задержкой
         setTimeout(() => {
-            resultsSection.scrollIntoView({
-                behavior: "smooth",
-                block: "center"
-            });
-        }, 100);
-    });
+            if (resultsSection) resultsSection.classList.add('show');
+            if (adviceSection) adviceSection.classList.add('show');
+        }, 300);
+        
+        // Скроллим к результатам
+        resultsContainer.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+        });
+    }, 50);
 }
+
+// Обновляем trackProgress
+setTimeout(() => {
+    showResults(p);
+    monitorAdviceProgress(taskId);
+}, 1500);
+
+function displayAdvice(adviceData) {
+    const adviceContent = document.getElementById('adviceContent');
+    const topBankName = document.getElementById('topBankName');
+    const topCashbackAmount = document.getElementById('topCashbackAmount');
+    
+    // Обновляем информацию о лучшем банке
+    if (adviceData.top_bank && adviceData.top_cashback) {
+        topBankName.textContent = adviceData.top_bank;
+        topCashbackAmount.textContent = `${adviceData.top_cashback.toLocaleString('ru-RU')} руб. кешбэка`;
+    }
+    
+    // Форматируем и отображаем рекомендации
+    if (adviceData.advice) {
+        adviceContent.innerHTML = `<div class="advice-text">${formatAdviceText(adviceData.advice)}</div>`;
+    } else if (adviceData.error) {
+        adviceContent.innerHTML = `<div class="text-warning">${adviceData.error}</div>`;
+    }
+}
+
 function monitorAdviceProgress(taskId) {
     const adviceContent = document.getElementById('adviceContent');
     const adviceInterval = setInterval(() => {
@@ -1016,11 +1242,7 @@ function monitorAdviceProgress(taskId) {
             .then(p => {
                 if (p.advice_result) {
                     clearInterval(adviceInterval);
-                    if (p.advice_result.advice) {
-                        displayAdvice(p.advice_result.advice);
-                    } else {
-                        adviceContent.innerHTML = '<div class="text-warning">Рекомендации не сгенерированы</div>';
-                    }
+                    displayAdvice(p.advice_result);
                 } else if (p.logs && p.logs.some(log => log.includes('Ошибка') || log.includes('❌'))) {
                     clearInterval(adviceInterval);
                     adviceContent.innerHTML = '<div class="text-warning">Не удалось сгенерировать рекомендации</div>';
@@ -1074,17 +1296,15 @@ function displayCategories(categories) {
     totalAmount.textContent = `${total.toLocaleString('ru-RU')} руб.`;
 }
 
-function displayAdvice(adviceText) {
-    const adviceContent = document.getElementById('adviceContent');
-    adviceContent.innerHTML = `<div class="advice-text">${formatAdviceText(adviceText)}</div>`;
-}
-
 function formatAdviceText(text) {
     return text
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        .replace(/\*\*(.*?)\*\*/g, '<strong style="color: #ffc107;">$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em style="color: #4cc9f0;">$1</em>')
         .replace(/\n/g, '<br>')
-        .replace(/^- (.*?)(<br>|$)/g, '• $1<br>');
+        .replace(/^(\d+[\.\)])\s*(.*?)(<br>|$)/g, '<strong>$1</strong> $2<br>')
+        .replace(/^- (.*?)(<br>|$)/g, '• <strong>$1</strong><br>')
+        .replace(/<\/strong><br><strong>/g, '</strong><br>')
+        .replace(/(<br>){3,}/g, '<br><br>');
 }
 </script>
 {% endblock %}
