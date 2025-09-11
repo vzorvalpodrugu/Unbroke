@@ -10,7 +10,7 @@ from core.views import (
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', LandingView.as_view(), name='landing'),
+    path('', LandingView.as_view(), name='home'),
     path("", include("users.urls")),
     path("upload/", StatementCreateView.as_view(), name="statement_upload"),
     path("progress/<str:task_id>/", get_progress, name="get_progress"),

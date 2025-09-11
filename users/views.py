@@ -9,7 +9,7 @@ from .forms import CustomUserCreationForm, CustomAuthenticationForm
 class UserRegisterView(CreateView):
     template_name = "user_templates/register.html"
     form_class = CustomUserCreationForm
-    success_url = reverse_lazy("landing")
+    success_url = reverse_lazy("home")
 
     def form_valid(self, form):
         messages.success(self.request, "Registration successful! 🎉")
@@ -26,7 +26,7 @@ class UserLoginView(LoginView):
     authentication_form = CustomAuthenticationForm
 
     def get_success_url(self):
-        return reverse_lazy("landing")
+        return reverse_lazy("home")
 
     def form_valid(self, form):
         messages.success(self.request, "Login successful! 🚀")
@@ -39,4 +39,10 @@ class UserLoginView(LoginView):
 
 
 class UserLogoutView(LogoutView):
-    next_page = reverse_lazy("landing")
+    next_page = reverse_lazy("home")
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            messages.success(request,
+                             "You have been successfully logged out! 👋")
+        return super().dispatch(request, *args, **kwargs)
