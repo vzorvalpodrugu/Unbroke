@@ -97,6 +97,7 @@ class CategoryAggregator:
 # === Основной пайплайн с прогрессом постранично ===
 
 def process_llm(file_field, bank: str = None, task_id: str = "default"):
+    print(f'начало отработки {task_id}')
     client = get_client()
     pdf_bytes = file_field.read()
     pages = convert_from_bytes(pdf_bytes)
