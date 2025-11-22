@@ -27,9 +27,23 @@ class Statement(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="statements")
     bank = models.ForeignKey(Bank, on_delete=models.CASCADE, related_name="statements")
     file = models.FileField(upload_to="statements/")
-    pars = models.TextField(blank=True, null=True)
+    pars = models.JSONField(null=True, blank=True)
     advice = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def get_pars_items(self):
+        """Возвращает items для pars в правильном формате"""
+        if self.pars:
+            if isinstance(self.pars, dict):
+                return self.pars.items()
+            elif isinstance(self.pars, str):
+                import json
+                try:
+                    data = json.loads(self.pars)
+                    return data.items() if isinstance(data, dict) else []
+                except json.JSONDecodeError:
+                    return []
+        return []
 
     def __str__(self):
         return f"Statement of {self.user.username} - {self.bank.bank_name}"
