@@ -1,22 +1,32 @@
+<!-- templates/navbar.html -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
   <div class="container-fluid">
     <a class="navbar-brand fw-bold" href="{% url 'home' %}">UNBROKE</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-            data-bs-target="#navbarNav" aria-controls="navbarNav"
+    
+    <!-- Кнопка для мобильной версии -->
+    <button class="navbar-toggler d-lg-none order-lg-2" type="button" data-bs-toggle="collapse"
+            data-bs-target="#navbarMobileContent" aria-controls="navbarMobileContent"
             aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
-	  
-    <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
-      <ul class="navbar-nav">
+    
+    <!-- Кнопка для десктопной версии (справа) -->
+    <button class="navbar-toggler d-none d-lg-block order-lg-3" type="button"
+            data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu"
+            aria-controls="sidebarMenu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- Мобильное меню (сверху) -->
+    <div class="collapse navbar-collapse d-lg-none" id="navbarMobileContent">
+      <ul class="navbar-nav ms-auto">
         {% if user.is_authenticated %}
-          <li class="nav-item"><span class="nav-link">Welcome, {{ user.username }}</span></li>
-          <form method="post" action="{% url 'logout' %}" class="d-inline">
-				{% csrf_token %}
-				<button type="submit" class="nav-link btn btn-link" style="border: none; background: none;">
-					Logout
-				</button>
-			</form>
+          <li class="nav-item">
+            <form method="post" action="{% url 'logout' %}" class="d-inline">
+              {% csrf_token %}
+              <button type="submit" class="nav-link btn btn-link">Logout</button>
+            </form>
+          </li>
         {% else %}
           <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
           <li class="nav-item"><a class="nav-link" href="{% url 'register' %}">Register</a></li>
@@ -26,14 +36,101 @@
   </div>
 </nav>
 
+<!-- Боковое меню справа для десктопа -->
+<div class="offcanvas offcanvas-end offcanvas-dark" tabindex="-1" id="sidebarMenu"
+     aria-labelledby="sidebarMenuLabel" data-bs-backdrop="true">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="sidebarMenuLabel">Menu</h5>
+    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"
+            aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body">
+    <ul class="nav flex-column">
+      {% if user.is_authenticated %}
+        <li class="nav-item mb-3">
+          <span class="nav-link text-white">Welcome, {{ user.username }}</span>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-white" href="{% url 'home' %}">
+            👤 Profile
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-white" href="{% url 'home' %}">
+            📊 Dashboard
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-white" href="{% url 'home' %}">
+            ⚙️ Settings
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-white" href="{% url 'home' %}">
+            ❓ Help
+          </a>
+        </li>
+        <li class="nav-item">
+          <hr class="dropdown-divider bg-light">
+        </li>
+        <li class="nav-item">
+          <form method="post" action="{% url 'logout' %}" class="d-inline">
+            {% csrf_token %}
+            <button type="submit" class="nav-link btn btn-link text-white p-0">
+              🚪 Logout
+            </button>
+          </form>
+        </li>
+      {% else %}
+        <li class="nav-item">
+          <a class="nav-link text-white" href="{% url 'login' %}">
+            🔐 Login
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-white" href="{% url 'register' %}">
+            📝 Register
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-white" href="{% url 'home' %}">
+            ❓ Help
+          </a>
+        </li>
+      {% endif %}
+    </ul>
+  </div>
+</div>
+
 <style>
-.navbar-transparent {
-    background-color: transparent !important;
-    transition: background-color 0.3s ease;
+.offcanvas-dark {
+    background-color: #212529 !important;
+    color: white;
 }
 
-.navbar-solid {
-    background-color: #212529 !important;
-    transition: background-color 0.3s ease;
+.offcanvas-dark .nav-link {
+    color: white !important;
+    padding: 0.75rem 1rem;
+    border-radius: 0.375rem;
+    transition: all 0.3s ease;
+}
+
+.offcanvas-dark .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: translateX(-5px);
+}
+
+.offcanvas-dark .btn-close {
+    filter: invert(1);
+    margin-right: 0;
+}
+
+/* Анимация для выезжания справа */
+.offcanvas-end {
+    transform: translateX(100%);
+}
+
+.offcanvas-end.show {
+    transform: translateX(0);
 }
 </style>
