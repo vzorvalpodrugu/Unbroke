@@ -1,8 +1,11 @@
 # core/views.py
 import threading
-from django.views.generic import TemplateView, CreateView
-from django.urls import reverse_lazy
 
+from django.shortcuts import render
+from django.views.generic import TemplateView, CreateView, ListView, \
+    DetailView, DeleteView
+from django.urls import reverse_lazy
+from django.core.paginator import Paginator
 from .mistral_advice import generate_bank_advice
 from .models import Statement
 from .forms import StatementForm
@@ -11,12 +14,35 @@ from django.core.cache import cache
 import uuid
 from django.http import JsonResponse
 # from mistral_advice import
-
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 class LandingView(TemplateView):
     template_name = "landing.html"
 
+class UserProfileView(LoginRequiredMixin, ListView):
+    model = Statement
+    template_name = 'profile.html'
+    context_object_name = 'statements'
+    paginate_by = 5  # Показывать только 5 последних выписок
+
+    def get_queryset(self):
+        # Только выписки текущего пользователя, отсортированные по дате создания (новые сверху)
+        return Statement.objects.filter(user=self.request.user).order_by('-created_at')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Общее количество выписок (без пагинации)
+        context['total_statements'] = Statement.objects.filter(user=self.request.user).count()
+        return context
+
+# def profile(request):
+#     statements = Statement.objects.filter(user=request.user).order_by('-uploaded_at')[:5]
+#     total_statements = Statement.objects.filter(user=request.user).count()
+#     return render(request, 'profile.html', {
+#         'statements': statements,
+#         'total_statements': total_statements
+#     })
 
 class StatementCreateView(CreateView):
     model = Statement
@@ -55,6 +81,23 @@ class StatementCreateView(CreateView):
         # ⚡ сразу возвращаем task_id
         return JsonResponse({"task_id": task_id})
 
+class StatementDetailView(LoginRequiredMixin, DetailView):
+    model = Statement
+    template_name = 'statement_detail.html'
+    context_object_name = 'statement'
+
+    def get_queryset(self):
+        # Пользователь может видеть только свои выписки
+        return Statement.objects.filter(user=self.request.user)
+
+class StatementDeleteView(LoginRequiredMixin, DeleteView):
+    model = Statement
+    template_name = 'statement_confirm_delete.html'
+    success_url = reverse_lazy('profile')
+
+    def get_queryset(self):
+        # Пользователь может удалять только свои выписки
+        return Statement.objects.filter(user=self.request.user)
 
 # эндпоинт для фронта
 def get_progress(request, task_id):
