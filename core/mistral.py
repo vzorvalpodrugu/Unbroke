@@ -108,6 +108,14 @@ def process_llm(file_field, bank: str = None, task_id: str = "default"):
     agg = CategoryAggregator(CATEGORIES)
     done_pages = []
 
+    # 🔥 НАХОДИМ Statement по file_field
+    from .models import Statement
+    try:
+        statement = Statement.objects.get(file=file_field)
+    except Statement.DoesNotExist:
+        # Если не нашли по файлу, ищем по task_id или другим способом
+        statement = None
+
     # Инициализируем прогресс
     cache.set(f"progress:{task_id}", {
         "current": 0,
@@ -116,6 +124,7 @@ def process_llm(file_field, bank: str = None, task_id: str = "default"):
         "logs": ["Запуск анализа..."],
         "done": False
     }, timeout=3600)
+
 
     for idx, page in enumerate(pages, 1):
         # Добавляем лог текущей страницы
@@ -168,8 +177,12 @@ def process_llm(file_field, bank: str = None, task_id: str = "default"):
         progress["pages_done"] = done_pages.copy()
         cache.set(f"progress:{task_id}", progress, timeout=3600)
 
-        # Финальный прогресс
     final_categories = agg.result()
+
+    # 🔥 СОХРАНЯЕМ pars В Statement
+    if statement:
+        statement.pars = final_categories
+        statement.save()
 
     # Запускаем генерацию рекомендаций в ОТДЕЛЬНОМ ПОТОКЕ
     def run_advice_generation():
@@ -180,6 +193,13 @@ def process_llm(file_field, bank: str = None, task_id: str = "default"):
 
             advice_result = generate_bank_advice(final_categories, task_id)
 
+            # 🔥 СОХРАНЯЕМ advice В Statement
+            if statement:
+                statement.advice = advice_result.get("advice",
+                                                     "") if isinstance(
+                    advice_result, dict) else str(advice_result)
+                statement.save()
+
             progress = cache.get(f"progress:{task_id}")
             progress["advice_result"] = advice_result
             progress["logs"].append("✅ Рекомендации готовы!")
@@ -187,7 +207,8 @@ def process_llm(file_field, bank: str = None, task_id: str = "default"):
 
         except Exception as e:
             progress = cache.get(f"progress:{task_id}")
-            progress["logs"].append(f"❌ Ошибка генерации рекомендаций: {e}")
+            progress["logs"].append(
+                f"❌ Ошибка генерации рекомендаций: {e}")
             cache.set(f"progress:{task_id}", progress, timeout=3600)
 
     # Запускаем в отдельном потоке
