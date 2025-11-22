@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="d-flex justify-content-center align-items-center vh-100" style="margin-top:-80px !important;">
+    <div class="card shadow-lg p-4 glass-card"
+         style="background: rgba(13, 27, 42, 0.8); border:1px solid #1e3a5f; border-radius:20px; width:900px;">
+
+        <!-- Заголовок -->
+        <div class="text-center mb-4">
+            <h3 class="text-light fw-bold mb-2">
+                <i class="bi bi-file-text me-2 text-primary"></i>
+                Детали выписки
+            </h3>
+            <p class="text-secondary">Подробная информация о загруженной выписке</p>
+            <hr style="border-color: rgba(255,255,255,0.1);">
+        </div>
+
+        <div class="row g-4">
+            <!-- Основная информация -->
+            <div class="col-md-6">
+                <div class="glass-card p-4 h-100" style="border-radius:12px; background: rgba(255,255,255,0.05);">
+                    <h5 class="text-light mb-4 text-center">
+                        <i class="bi bi-info-circle me-2 text-info"></i>
+                        Основная информация
+                    </h5>
+                    
+                    <div class="info-item mb-3">
+                        <small class="text-secondary d-block">Пользователь</small>
+                        <div class="text-light fw-bold">
+                            <i class="bi bi-person me-2 text-info"></i>
+                            {{ statement.user.username }}
+                        </div>
+                    </div>
+                    
+                    <div class="info-item mb-3">
+                        <small class="text-secondary d-block">Банк</small>
+                        <div class="text-light fw-bold">
+                            <div class="d-flex align-items-center">
+                                <div class="bank-logo me-2" style="width: 24px;">
+                                    {% if statement.bank_id == 1 %}
+                                    <img src="{% static 'icons/tbank.png' %}" alt="Tbank" class="bank-icon" style="height: 20px; width: auto;">
+                                    {% elif statement.bank_id == 2 %}
+                                    <img src="{% static 'icons/sberbank.png' %}" alt="Sberbank" class="bank-icon" style="height: 20px; width: auto;">
+                                    {% elif statement.bank_id == 3 %}
+                                    <img src="{% static 'icons/alphabank.png' %}" alt="AlphaBank" class="bank-icon" style="height: 20px; width: auto;">
+                                    {% elif statement.bank_id == 4 %}
+                                    <img src="{% static 'icons/vtb.png' %}" alt="VTB" class="bank-icon" style="height: 20px; width: auto;">
+                                    {% elif statement.bank_id == 5 %}
+                                    <img src="{% static 'icons/gazprombank.png' %}" alt="Gazprombank" class="bank-icon" style="height: 20px; width: auto;">
+                                    {% else %}
+                                    <i class="bi bi-building text-info"></i>
+                                    {% endif %}
+                                </div>
+                                {{ statement.get_bank_display }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="info-item mb-3">
+                        <small class="text-secondary d-block">Файл</small>
+                        <div class="text-light fw-bold">
+                            <i class="bi bi-file-earmark me-2 text-warning"></i>
+                            {{ statement.filename }}
+                        </div>
+                    </div>
+
+                    <div class="info-item mb-4">
+                        <small class="text-secondary d-block">Дата загрузки</small>
+                        <div class="text-light fw-bold">
+                            <i class="bi bi-calendar me-2 text-success"></i>
+                            {{ statement.created_at|date:"d.m.Y H:i" }}
+                        </div>
+                    </div>
+
+                    <!-- Кнопка возврата -->
+                    <div class="d-grid">
+                        <a href="{% url 'profile' %}" class="btn btn-outline-primary rounded-pill py-2">
+                            <i class="bi bi-arrow-left me-2"></i>Назад к профилю
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Анализ и категории -->
+            <div class="col-md-6">
+                <div class="glass-card p-4 h-100"
+                     style="border-radius:12px; background: rgba(255,255,255,0.05); border:1px solid rgba(76, 201, 240, 0.2);">
+                    
+                    <!-- Суммы по категориям -->
+                    <h5 class="text-light mb-3 text-center">
+                        <i class="bi bi-pie-chart me-2 text-warning"></i>
+                        Суммы по категориям
+                    </h5>
+
+                    {% if statement.pars %}
+                    <div class="categories-list mb-4">
+                        {% for category, amount in statement.pars.items %}
+                        <div class="category-item d-flex justify-content-between align-items-center py-2"
+                             style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                            <span class="text-light" style="font-size: 0.9rem;">{{ category }}</span>
+                            <span class="text-info fw-bold" style="font-size: 0.9rem;">{{ amount }} ₽</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center text-secondary py-3">
+                        <i class="bi bi-exclamation-circle d-block mb-2" style="font-size: 1.5rem;"></i>
+                        <small class="text-light">Нет данных по категориям</small>
+                    </div>
+                    {% endif %}
+
+                    <!-- Совет -->
+                    <h5 class="text-light mb-3 text-center">
+                        <i class="bi bi-lightbulb me-2 text-info"></i>
+                        Совет от Mistral
+                    </h5>
+
+                    {% if statement.advice %}
+                    <div class="advice-box glass-card p-3"
+                         style="border-radius:8px; background: rgba(76, 201, 240, 0.1); border:1px solid rgba(76, 201, 240, 0.3);">
+                        <p class="text-light mb-0" style="font-size: 0.9rem; line-height: 1.4;">
+                            {{ statement.advice }}
+                        </p>
+                    </div>
+                    {% else %}
+                    <div class="text-center text-secondary py-3">
+                        <i class="bi bi-chat-left d-block mb-2" style="font-size: 1.5rem;"></i>
+                        <small class="text-light">Совет не сгенерирован</small>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.glass-card {
+    background: rgba(13, 27, 42, 0.8) !important;
+    backdrop-filter: blur(25px);
+    border: 1px solid rgba(76, 201, 240, 0.2) !important;
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.4);
+}
+
+.info-item {
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.info-item:last-child {
+    border-bottom: none;
+}
+
+.category-item:last-child {
+    border-bottom: none !important;
+}
+
+.advice-box {
+    background: linear-gradient(135deg, rgba(76, 201, 240, 0.1), rgba(67, 97, 238, 0.1)) !important;
+}
+
+/* Кнопки */
+.btn-outline-primary {
+    border-color: rgba(76, 201, 240, 0.5);
+    color: #4cc9f0;
+    transition: all 0.3s ease;
+}
+.btn-outline-primary:hover {
+    background: #4cc9f0;
+    color: #0d1b2a;
+    box-shadow: 0 0 15px rgba(76, 201, 240, 0.7);
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .card {
+        width: 95% !important;
+        padding: 1rem !important;
+    }
+    
+    .row.g-4 {
+        flex-direction: column;
+    }
+    
+    .col-md-6 {
+        width: 100%;
+    }
+}
+</style>
+{% endblock %}
