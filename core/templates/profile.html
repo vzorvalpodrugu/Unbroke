@@ -1,0 +1,262 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="d-flex justify-content-center align-items-center vh-100" style="margin-top:-80px !important;">
+    <div class="card shadow-lg p-4 glass-card"
+         style="background: rgba(13, 27, 42, 0.8); border:1px solid #1e3a5f; border-radius:20px; width:800px;">
+        
+        <div class="row g-4">
+            <!-- Основная информация пользователя -->
+            <div class="col-md-6">
+                <div class="glass-card p-4 h-100" style="border-radius:12px; background: rgba(255,255,255,0.05);">
+                    <h5 class="text-light mb-4 text-center">
+                        <i class="bi bi-person-circle me-2 text-primary"></i>
+                        Информация профиля
+                    </h5>
+                    
+                    <div class="info-item mb-3">
+                        <small class="text-secondary d-block">Ваш логин</small>
+                        <div class="text-light fw-bold">
+                            <i class="bi bi-person me-2 text-info"></i>
+                            {{ user.username }}
+                        </div>
+                    </div>
+                    
+                    <div class="info-item mb-3">
+                        <small class="text-secondary d-block">Дата регистрации</small>
+                        <div class="text-light fw-bold">
+                            <i class="bi bi-calendar me-2 text-success"></i>
+                            {{ user.date_joined|date:"d.m.Y" }}
+                        </div>
+                    </div>
+                    
+                    <div class="info-item mb-4">
+                        <small class="text-secondary d-block">Количество выписок</small>
+                        <div class="text-light fw-bold">
+                            <i class="bi bi-file-text me-2 text-warning"></i>
+                            {{ total_statements }}
+                        </div>
+                    </div>
+
+                    <!-- Кнопка загрузки -->
+                    <div class="d-grid">
+                        <a href="{% url 'statement_upload' %}" class="btn btn-outline-primary rounded-pill py-2">
+                            <i class="bi bi-cloud-upload me-2"></i>Загрузить выписку
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Блок выписок -->
+            <div class="col-md-6">
+                <div class="glass-card p-3 h-100"
+                     style="border-radius:12px; background: rgba(255,255,255,0.05); border:1px solid rgba(76, 201, 240, 0.2);">
+                    
+                    <!-- Заголовок блока выписок -->
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="text-light mb-0">
+                            <i class="bi bi-clock-history me-2 text-info"></i>
+                            Последние выписки
+                        </h6>
+                    </div>
+
+                    <!-- Список выписок -->
+                    {% if statements %}
+                    <div class="statements-list">
+                        {% for st in statements %}
+                        <div class="statement-item glass-card p-2 mb-2"
+                             style="border-radius:8px; background: rgba(255,255,255,0.03); border:1px solid rgba(76, 201, 240, 0.1); transition: all 0.3s ease;">
+                            
+                            <div class="d-flex align-items-center justify-content-between">
+                                <!-- Логотип банка -->
+                                <div class="bank-logo me-2" style="width: 30px; flex-shrink: 0;">
+                                    {% if st.bank_id == 1 %}
+                                    <img src="{% static 'icons/tbank.png' %}" alt="Tbank" class="bank-icon" style="height: 30px; width: auto;">
+                                    {% elif st.bank_id == 2 %}
+                                    <img src="{% static 'icons/sberbank.png' %}" alt="Sberbank" class="bank-icon" style="height: 30px; width: auto;">
+                                    {% elif st.bank_id == 3 %}
+                                    <img src="{% static 'icons/alphabank.png' %}" alt="AlphaBank" class="bank-icon" style="height: 30px; width: auto;">
+                                    {% elif st.bank_id == 4 %}
+                                    <img src="{% static 'icons/vtb.png' %}" alt="VTB" class="bank-icon" style="height: 30px; width: auto;">
+                                    {% elif st.bank_id == 5 %}
+                                    <img src="{% static 'icons/gazprombank.png' %}" alt="Gazprombank" class="bank-icon" style="height: 30px; width: auto;">
+                                    {% else %}
+                                    <div class="bank-placeholder" style="height: 20px; display: flex; align-items: center; justify-content: center;">
+                                        <i class="bi bi-building text-info" style="font-size: 0.9rem;"></i>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <!-- Название файла и дата -->
+                                <div class="file-info me-2" style="flex: 1; min-width: 0;">
+                                    <div class="filename">
+                                        <small class="text-light text-truncate d-block" style="font-size: 0.75rem;">
+                                            {{ st.filename }}
+                                        </small>
+                                    </div>
+                                    <div class="date">
+                                        <small class="text-muted" style="font-size: 0.7rem;">
+                                            {{ st.uploaded_at|date:"d.m.Y H:i" }}
+                                        </small>
+                                    </div>
+                                </div>
+
+                                <!-- Действия -->
+								<div class="actions" style="flex-shrink: 0;">
+									<a href="{% url 'statement_detail' st.id %}" class="btn btn-sm btn-outline-info rounded-pill px-2 py-0 me-1" style="font-size: 0.6rem;">
+										<i class="bi bi-eye"></i>
+									</a>
+									<a href="{% url 'statement_delete' st.id %}" class="btn btn-sm btn-outline-danger rounded-pill px-2 py-0" style="font-size: 0.6rem;">
+										<i class="bi bi-trash"></i>
+									</a>
+								</div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Кнопка просмотра всех выписок -->
+                    {% if total_statements > 5 %}
+                    <div class="text-center mt-3">
+                        <a href="" class="btn btn-outline-light btn-sm rounded-pill px-3" style="font-size: 0.75rem;">
+                            <i class="bi bi-list-ul me-1"></i>
+                            Все выписки
+                        </a>
+                    </div>
+                    {% endif %}
+
+                    {% else %}
+                    <!-- Блок при отсутствии выписок -->
+                    <div class="text-center text-secondary py-3">
+                        <i class="bi bi-inbox d-block mb-1" style="color: #4cc9f0; font-size: 1.2rem;"></i>
+                        <small class="text-light d-block" style="font-size: 0.8rem;">Нет выписок</small>
+                        <small class="text-muted" style="font-size: 0.7rem;">Загрузите первую</small>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.glass-card {
+    background: rgba(13, 27, 42, 0.8) !important;
+    backdrop-filter: blur(25px);
+    border: 1px solid rgba(76, 201, 240, 0.2) !important;
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.4);
+}
+
+.info-item {
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.info-item:last-child {
+    border-bottom: none;
+}
+
+/* Анимации для карточек выписок */
+.statement-item {
+    animation: fadeInUp 0.5s ease forwards;
+    opacity: 0;
+    transform: translateY(10px);
+}
+.statement-item:nth-child(1) { animation-delay: 0.1s; }
+.statement-item:nth-child(2) { animation-delay: 0.2s; }
+.statement-item:nth-child(3) { animation-delay: 0.3s; }
+.statement-item:nth-child(4) { animation-delay: 0.4s; }
+.statement-item:nth-child(5) { animation-delay: 0.5s; }
+
+.statement-item:hover {
+    background: rgba(76, 201, 240, 0.08) !important;
+    border-color: rgba(76, 201, 240, 0.3) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(76, 201, 240, 0.2);
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Логотипы банков */
+.bank-icon {
+    max-width: 100%;
+    object-fit: contain;
+    filter: brightness(0.9);
+    transition: all 0.3s ease;
+}
+
+.statement-item:hover .bank-icon {
+    filter: brightness(1.1);
+    transform: scale(1.1);
+}
+
+/* Кнопки */
+.btn-outline-info {
+    border-color: rgba(76, 201, 240, 0.5);
+    color: #4cc9f0;
+    transition: all 0.3s ease;
+}
+.btn-outline-info:hover {
+    background: #4cc9f0;
+    color: #0d1b2a;
+    box-shadow: 0 0 8px rgba(76, 201, 240, 0.7);
+}
+
+.btn-outline-danger {
+    border-color: rgba(247, 37, 133, 0.5);
+    color: #f72585;
+    transition: all 0.3s ease;
+}
+.btn-outline-danger:hover {
+    background: #f72585;
+    color: #fff;
+    box-shadow: 0 0 8px rgba(247, 37, 133, 0.6);
+}
+
+.btn-outline-light {
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #fff;
+    transition: all 0.3s ease;
+}
+.btn-outline-light:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.5);
+    color: #fff;
+}
+
+.btn-outline-primary {
+    border-color: rgba(76, 201, 240, 0.5);
+    color: #4cc9f0;
+    transition: all 0.3s ease;
+}
+.btn-outline-primary:hover {
+    background: #4cc9f0;
+    color: #0d1b2a;
+    box-shadow: 0 0 15px rgba(76, 201, 240, 0.7);
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .card {
+        width: 95% !important;
+        padding: 1rem !important;
+    }
+    
+    .row.g-4 {
+        flex-direction: column;
+    }
+    
+    .col-md-6 {
+        width: 100%;
+    }
+    
+    .bank-icon {
+        height: 18px !important;
+    }
+}
+</style>
+{% endblock %}
