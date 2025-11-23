@@ -1,10 +1,208 @@
-<!-- Ваш лендинг -->
 {% extends "base.html" %}
-
 {% block content %}
-<div class="container text-center" style="margin-top: 40px !important;">
-    <h1 class="display-3 fw-bold">Welcome to UNBROKE</h1>
-    <p class="lead">Your path to financial freedom starts here 🚀</p>
-    <a href="{% url 'register' %}" class="btn btn-lg btn-dark fw-bold mt-3">Get Started</a>
+
+<!-- templates/landing.html -->
+<div class="container mt-5 pt-5">
+    <div class="row align-items-center min-vh-75">
+        <!-- Левая колонка с текстом -->
+        <div class="col-lg-6">
+            <h1 class="display-4 fw-bold text-white mb-4">
+                Возьмите под контроль
+                <span class="gradient-text">Ваши финансы</span>
+            </h1>
+            <p class="lead text-white-50 mb-5">
+                AI-анализ финансовых данных поможет вам понять свои привычки расходов,
+                оптимизировать бюджет и достичь финансовых целей.
+            </p>
+
+            <!-- Кнопка только для неавторизованных пользователей -->
+            {% if not user.is_authenticated %}
+            <div class="d-flex gap-3 mb-5">
+                <a href="{% url 'register' %}" class="btn gradient-btn btn-lg px-4 py-2 fw-bold">
+                    🚀 Начать
+                </a>
+                <a href="{% url 'login' %}" class="btn btn-outline-light btn-lg px-4 py-2">
+                    Войти
+                </a>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Правая колонка с иллюстрацией -->
+        <div class="col-lg-6">
+            <div class="text-center">
+                <div class="dashboard-preview p-4 rounded-3 bg-dark bg-opacity-50 border-gradient">
+                    <i class="fas fa-chart-line display-1 gradient-text mb-3"></i>
+                    <h4 class="text-white">Умный финансовый дашборд</h4>
+                    <p class="text-white-50">Визуализируйте ваше финансовое состояние в одном месте</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Секция "Как это работает" -->
+    <div class="row mt-5 pt-5">
+        <div class="col-12">
+            <h2 class="text-center text-white mb-5">Как это работает</h2>
+            
+            <div class="row g-4">
+                <!-- Шаг 1 -->
+                <div class="col-md-6">
+                    <div class="card h-100 bg-dark border-gradient">
+                        <div class="card-body text-center p-4">
+                            <div class="step-number gradient-bg rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                                 style="width: 60px; height: 60px;">
+                                <span class="fs-3 fw-bold text-white">1</span>
+                            </div>
+                            <h5 class="text-white mb-3">Загрузка выписки</h5>
+                            <p class="text-white-50">
+                                Чтобы начать анализ ваших выписок на сайте, требуется скачать выписку из вашего банка и загрузить этот файл во вкладке <strong>Upload</strong>, выбрав соответствующий банк.
+                            </p>
+                            {% if user.is_authenticated %}
+                            <a href="{% url 'statement_upload' %}" class="btn btn-outline-gradient mt-3">
+                                📤 Перейти к загрузке
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Шаг 2 -->
+                <div class="col-md-6">
+                    <div class="card h-100 bg-dark border-gradient">
+                        <div class="card-body text-center p-4">
+                            <div class="step-number gradient-bg rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                                 style="width: 60px; height: 60px;">
+                                <span class="fs-3 fw-bold text-white">2</span>
+                            </div>
+                            <h5 class="text-white mb-3">История анализов</h5>
+                            <p class="text-white-50">
+                                Для того чтобы ознакомиться с результатами предыдущих выписок, вы можете найти их в своём <strong>профиле</strong>. Вся история анализов сохраняется для вашего удобства.
+                            </p>
+                            {% if user.is_authenticated %}
+                            <a href="{% url 'profile' %}" class="btn btn-outline-gradient mt-3">
+                                👤 Мой профиль
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Дополнительные преимущества -->
+    <div class="row mt-5 pt-5">
+        <div class="col-12">
+            <h2 class="text-center text-white mb-5">Преимущества</h2>
+            <div class="row g-4">
+                <div class="col-md-3">
+                    <div class="text-center text-white">
+                        <i class="fas fa-shield-alt fa-2x gradient-text mb-3"></i>
+                        <h5>Безопасность</h5>
+                        <p class="text-white-50 small">Ваши данные защищены и не передаются третьим лицам</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="text-center text-white">
+                        <i class="fas fa-bolt fa-2x gradient-text mb-3"></i>
+                        <h5>Быстрый анализ</h5>
+                        <p class="text-white-50 small">Мгновенная обработка данных с помощью AI</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="text-center text-white">
+                        <i class="fas fa-chart-pie fa-2x gradient-text mb-3"></i>
+                        <h5>Детальная аналитика</h5>
+                        <p class="text-white-50 small">Категоризация расходов</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="text-center text-white">
+                        <i class="fas fa-mobile-alt fa-2x gradient-text mb-3"></i>
+                        <h5>Удобство</h5>
+                        <p class="text-white-50 small">Работает на всех устройствах в любое время</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<style>
+.min-vh-75 {
+    min-height: 75vh;
+}
+
+/* Градиент от розового к голубому */
+.gradient-text {
+    background: linear-gradient(135deg, #ff6b9d, #6bc5f8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.gradient-bg {
+    background: linear-gradient(135deg, #ff6b9d, #6bc5f8);
+}
+
+.gradient-btn {
+    background: linear-gradient(135deg, #ff6b9d, #6bc5f8);
+    border: none;
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.gradient-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(255, 107, 157, 0.3);
+    color: white;
+}
+
+.border-gradient {
+    border: 2px solid;
+    border-image: linear-gradient(135deg, #ff6b9d, #6bc5f8) 1;
+}
+
+.btn-outline-gradient {
+    border: 1px solid;
+    border-image: linear-gradient(135deg, #ff6b9d, #6bc5f8) 1;
+    color: #6bc5f8;
+    background: transparent;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-gradient:hover {
+    background: linear-gradient(135deg, #ff6b9d, #6bc5f8);
+    color: white;
+    transform: translateY(-2px);
+}
+
+.step-number {
+    transition: transform 0.3s ease;
+}
+
+.card:hover .step-number {
+    transform: scale(1.1);
+}
+
+.card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(255, 107, 157, 0.15);
+}
+
+.dashboard-preview {
+    transition: all 0.3s ease;
+}
+
+.dashboard-preview:hover {
+    box-shadow: 0 0 30px rgba(255, 107, 157, 0.2);
+    transform: scale(1.02);
+}
+</style>
+
 {% endblock %}
