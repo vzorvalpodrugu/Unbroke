@@ -1,41 +1,51 @@
 <!-- templates/navbar.html -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+<nav class="navbar navbar-dark bg-dark fixed-top">
   <div class="container-fluid">
     <a class="navbar-brand fw-bold" href="{% url 'home' %}">UNBROKE</a>
     
-    <!-- Профиль пользователя для десктопной версии -->
+    <!-- Десктопная часть - имя пользователя с ссылкой и кнопка бокового меню -->
     {% if user.is_authenticated %}
-    <div class="d-none d-lg-flex align-items-center order-lg-2 me-3">
-      <a class="nav-link text-white p-0" href="{% url 'profile' %}" title="Profile">
+    <div class="d-none d-lg-flex align-items-center ms-auto me-3">
+      <a class="nav-link text-white p-0 me-3" href="{% url 'profile' %}" title="Profile">
         <div class="d-flex align-items-center">
           <span class="me-2">👤</span>
           <span>{{ user.username }}</span>
         </div>
       </a>
+      <button class="navbar-toggler" type="button"
+              data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu"
+              aria-controls="sidebarMenu">
+        <span class="navbar-toggler-icon"></span>
+      </button>
     </div>
     {% endif %}
     
-    <!-- Кнопка для мобильной версии -->
-    <button class="navbar-toggler d-lg-none order-lg-2" type="button" data-bs-toggle="collapse"
-            data-bs-target="#navbarMobileContent" aria-controls="navbarMobileContent"
-            aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    
-    <!-- Кнопка для десктопной версии (справа) -->
-    <button class="navbar-toggler d-none d-lg-block order-lg-3" type="button"
-            data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu"
-            aria-controls="sidebarMenu">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-	  
+    <!-- Мобильная часть - кнопка гамбургера -->
+    <div class="d-flex d-lg-none">
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+              data-bs-target="#navbarMobileContent" aria-controls="navbarMobileContent"
+              aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+    </div>
+
+    <!-- Мобильное меню - ТОЛЬКО для мобильных -->
     <div class="collapse navbar-collapse d-lg-none" id="navbarMobileContent">
       <ul class="navbar-nav ms-auto">
         {% if user.is_authenticated %}
           <li class="nav-item">
+            <a class="nav-link" href="{% url 'home' %}">📊 Landing</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'profile' %}">👤 Profile</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'statement_upload' %}">📤 Upload</a>
+          </li>
+          <li class="nav-item">
             <form method="post" action="{% url 'logout' %}" class="d-inline">
               {% csrf_token %}
-              <button type="submit" class="nav-link btn btn-link">🚪 Logout</button>
+              <button type="submit" class="nav-link btn btn-link p-0">🚪 Logout</button>
             </form>
           </li>
         {% else %}
@@ -47,7 +57,7 @@
   </div>
 </nav>
 
-<!-- Боковое меню справа для десктопа -->
+<!-- Боковое меню для десктопа -->
 <div class="offcanvas offcanvas-end offcanvas-dark" tabindex="-1" id="sidebarMenu"
      aria-labelledby="sidebarMenuLabel" data-bs-backdrop="true">
   <div class="offcanvas-header">
@@ -61,39 +71,29 @@
         <li class="nav-item mb-3">
           <span class="nav-link text-white">Welcome, {{ user.username }}</span>
         </li>
-		<li class="nav-item">
-          <a class="nav-link text-white" href="{% url 'home' %}">
-            📊 Landing
-          </a>
+        <li class="nav-item">
+          <a class="nav-link text-white" href="{% url 'home' %}">📊 Landing</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link text-white" href="{% url 'profile' %}">
-            👤 Profile
-          </a>
-        </li>
-		<li class="nav-item">
-		  <a class="nav-link text-white" href="{% url 'statement_upload' %}">
-			📤 Upload
-		  </a>
+          <a class="nav-link text-white" href="{% url 'profile' %}">👤 Profile</a>
         </li>
         <li class="nav-item">
-			<form method="post" action="{% url 'logout' %}" class="d-inline w-100">
-				{% csrf_token %}
-				<button type="submit" class="nav-link text-white p-0 w-100 text-start border-0 bg-transparent">
-					🚪 Logout
-				</button>
-			</form>
-		</li>
+          <a class="nav-link text-white" href="{% url 'statement_upload' %}">📤 Upload</a>
+        </li>
+        <li class="nav-item">
+          <form method="post" action="{% url 'logout' %}" class="d-inline w-100">
+            {% csrf_token %}
+            <button type="submit" class="nav-link text-white p-0 w-100 text-start border-0 bg-transparent">
+              🚪 Logout
+            </button>
+          </form>
+        </li>
       {% else %}
         <li class="nav-item">
-          <a class="nav-link text-white" href="{% url 'login' %}">
-            🔐 Login
-          </a>
+          <a class="nav-link text-white" href="{% url 'login' %}">🔐 Login</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link text-white" href="{% url 'register' %}">
-            📝 Register
-          </a>
+          <a class="nav-link text-white" href="{% url 'register' %}">📝 Register</a>
         </li>
       {% endif %}
     </ul>
@@ -123,7 +123,6 @@
     margin-right: 0;
 }
 
-/* Анимация для выезжания справа */
 .offcanvas-end {
     transform: translateX(100%);
 }
