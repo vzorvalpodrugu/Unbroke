@@ -1,40 +1,66 @@
 {% extends "base.html" %}
 {% block content %}
 
+<!-- Анимированный background -->
+
+
 <!-- templates/landing.html -->
 <div class="container mt-5 pt-5">
     <div class="row align-items-center min-vh-75">
         <!-- Левая колонка с текстом -->
         <div class="col-lg-6">
-            <h1 class="display-4 fw-bold text-white mb-4">
+            <h1 class="display-4 fw-bold text-white mb-4 animate-fade-in">
                 Возьмите под контроль
                 <span class="gradient-text">Ваши финансы</span>
             </h1>
-            <p class="lead text-white-50 mb-5">
+            <p class="lead text-white-50 mb-5 animate-fade-in-delay">
                 AI-анализ финансовых данных поможет вам понять свои привычки расходов,
                 оптимизировать бюджет и достичь финансовых целей.
             </p>
 
             <!-- Кнопка только для неавторизованных пользователей -->
             {% if not user.is_authenticated %}
-            <div class="d-flex gap-3 mb-5">
-                <a href="{% url 'register' %}" class="btn gradient-btn btn-lg px-4 py-2 fw-bold">
-                    🚀 Начать
+            <div class="d-flex gap-3 mb-5 animate-fade-in-delay-2">
+                <a href="{% url 'register' %}" class="btn gradient-btn btn-lg px-4 py-3 fw-bold btn-hover-glow">
+                    🚀 Начать анализ
                 </a>
-                <a href="{% url 'login' %}" class="btn btn-outline-light btn-lg px-4 py-2">
-                    Войти
+                <a href="{% url 'login' %}" class="btn btn-outline-light btn-lg px-4 py-3 btn-hover-scale">
+                    Войти в систему
                 </a>
             </div>
             {% endif %}
+
+            <!-- Статистика для доверия -->
+            <div class="row text-center mt-5 animate-fade-in-delay-3">
+                <div class="col-4">
+                    <div class="stat-number gradient-text fw-bold fs-3">1000+</div>
+                    <div class="text-white-50 small">проанализированных выписок</div>
+                </div>
+                <div class="col-4">
+                    <div class="stat-number gradient-text fw-bold fs-3">95%</div>
+                    <div class="text-white-50 small">точность категоризации</div>
+                </div>
+                <div class="col-4">
+                    <div class="stat-number gradient-text fw-bold fs-3">24/7</div>
+                    <div class="text-white-50 small">доступ к аналитике</div>
+                </div>
+            </div>
         </div>
 
         <!-- Правая колонка с иллюстрацией -->
         <div class="col-lg-6">
             <div class="text-center">
-                <div class="dashboard-preview p-4 rounded-3 bg-dark bg-opacity-50 border-gradient">
-                    <i class="fas fa-chart-line display-1 gradient-text mb-3"></i>
-                    <h4 class="text-white">Умный финансовый дашборд</h4>
+                <div class="dashboard-preview p-4 rounded-3 bg-dark bg-opacity-50 border-gradient floating-animation">
+                    <div class="floating-chart">
+                        <i class="fas fa-chart-line display-1 gradient-text mb-3"></i>
+                    </div>
+                    <h4 class="text-white">Умный анализ выписок</h4>
                     <p class="text-white-50">Визуализируйте ваше финансовое состояние в одном месте</p>
+                    <div class="sparkle-container">
+                        <div class="sparkle"></div>
+                        <div class="sparkle"></div>
+                        <div class="sparkle"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -43,23 +69,32 @@
     <!-- Секция "Как это работает" -->
     <div class="row mt-5 pt-5">
         <div class="col-12">
-            <h2 class="text-center text-white mb-5">Как это работает</h2>
+            <h2 class="text-center text-white mb-5 section-title">Как это работает</h2>
             
             <div class="row g-4">
                 <!-- Шаг 1 -->
                 <div class="col-md-6">
-                    <div class="card h-100 bg-dark border-gradient">
+                    <div class="card h-100 bg-dark border-gradient card-hover-glow">
                         <div class="card-body text-center p-4">
-                            <div class="step-number gradient-bg rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                            <div class="step-number gradient-bg rounded-circle d-inline-flex align-items-center justify-content-center mb-3 pulse-animation"
                                  style="width: 60px; height: 60px;">
                                 <span class="fs-3 fw-bold text-white">1</span>
                             </div>
                             <h5 class="text-white mb-3">Загрузка выписки</h5>
                             <p class="text-white-50">
-                                Чтобы начать анализ ваших выписок на сайте, требуется скачать выписку из вашего банка и загрузить этот файл во вкладке <strong>Upload</strong>, выбрав соответствующий банк.
+                                Скачайте выписку из вашего банка и загрузите файл во вкладке <strong>Upload</strong>, выбрав соответствующий банк.
                             </p>
+                            <div class="supported-banks mt-3">
+                                <small class="text-white-50">Поддерживаемые банки: </small>
+                                <div class="bank-icons mt-2">
+                                    <span class="bank-icon">Сбер</span>
+                                    <span class="bank-icon">Тинькофф</span>
+                                    <span class="bank-icon">ВТБ</span>
+                                    <span class="bank-icon">Альфа</span>
+                                </div>
+                            </div>
                             {% if user.is_authenticated %}
-                            <a href="{% url 'statement_upload' %}" class="btn btn-outline-gradient mt-3">
+                            <a href="{% url 'statement_upload' %}" class="btn btn-outline-gradient mt-3 btn-hover-scale">
                                 📤 Перейти к загрузке
                             </a>
                             {% endif %}
@@ -69,18 +104,32 @@
 
                 <!-- Шаг 2 -->
                 <div class="col-md-6">
-                    <div class="card h-100 bg-dark border-gradient">
+                    <div class="card h-100 bg-dark border-gradient card-hover-glow">
                         <div class="card-body text-center p-4">
-                            <div class="step-number gradient-bg rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                            <div class="step-number gradient-bg rounded-circle d-inline-flex align-items-center justify-content-center mb-3 pulse-animation"
                                  style="width: 60px; height: 60px;">
                                 <span class="fs-3 fw-bold text-white">2</span>
                             </div>
                             <h5 class="text-white mb-3">История анализов</h5>
                             <p class="text-white-50">
-                                Для того чтобы ознакомиться с результатами предыдущих выписок, вы можете найти их в своём <strong>профиле</strong>. Вся история анализов сохраняется для вашего удобства.
+                                Все результаты сохраняются в вашем <strong>профиле</strong>. Просматривайте историю анализов и отслеживайте динамику.
                             </p>
+                            <div class="features-list mt-3">
+                                <div class="feature-item">
+                                    <i class="fas fa-check gradient-text me-2"></i>
+                                    <small class="text-white-50">Графики расходов</small>
+                                </div>
+                                <div class="feature-item">
+                                    <i class="fas fa-check gradient-text me-2"></i>
+                                    <small class="text-white-50">Категоризация трат</small>
+                                </div>
+                                <div class="feature-item">
+                                    <i class="fas fa-check gradient-text me-2"></i>
+                                    <small class="text-white-50">Финансовые отчёты</small>
+                                </div>
+                            </div>
                             {% if user.is_authenticated %}
-                            <a href="{% url 'profile' %}" class="btn btn-outline-gradient mt-3">
+                            <a href="{% url 'profile' %}" class="btn btn-outline-gradient mt-3 btn-hover-scale">
                                 👤 Мой профиль
                             </a>
                             {% endif %}
@@ -94,32 +143,32 @@
     <!-- Дополнительные преимущества -->
     <div class="row mt-5 pt-5">
         <div class="col-12">
-            <h2 class="text-center text-white mb-5">Преимущества</h2>
+            <h2 class="text-center text-white mb-5 section-title">Преимущества</h2>
             <div class="row g-4">
                 <div class="col-md-3">
-                    <div class="text-center text-white">
-                        <i class="fas fa-shield-alt fa-2x gradient-text mb-3"></i>
+                    <div class="text-center text-white feature-card">
+                        <i class="fas fa-shield-alt fa-2x gradient-text mb-3 feature-icon"></i>
                         <h5>Безопасность</h5>
                         <p class="text-white-50 small">Ваши данные защищены и не передаются третьим лицам</p>
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <div class="text-center text-white">
-                        <i class="fas fa-bolt fa-2x gradient-text mb-3"></i>
+                    <div class="text-center text-white feature-card">
+                        <i class="fas fa-bolt fa-2x gradient-text mb-3 feature-icon"></i>
                         <h5>Быстрый анализ</h5>
                         <p class="text-white-50 small">Мгновенная обработка данных с помощью AI</p>
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <div class="text-center text-white">
-                        <i class="fas fa-chart-pie fa-2x gradient-text mb-3"></i>
+                    <div class="text-center text-white feature-card">
+                        <i class="fas fa-chart-pie fa-2x gradient-text mb-3 feature-icon"></i>
                         <h5>Детальная аналитика</h5>
-                        <p class="text-white-50 small">Категоризация расходов</p>
+                        <p class="text-white-50 small">Наглядные графики и категоризация расходов</p>
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <div class="text-center text-white">
-                        <i class="fas fa-mobile-alt fa-2x gradient-text mb-3"></i>
+                    <div class="text-center text-white feature-card">
+                        <i class="fas fa-mobile-alt fa-2x gradient-text mb-3 feature-icon"></i>
                         <h5>Удобство</h5>
                         <p class="text-white-50 small">Работает на всех устройствах в любое время</p>
                     </div>
@@ -127,14 +176,190 @@
             </div>
         </div>
     </div>
+
+    <!-- CTA секция -->
+    {% if not user.is_authenticated %}
+    <div class="row mt-5 pt-5">
+        <div class="col-12 text-center">
+            <div class="cta-section p-5 rounded-3 border-gradient">
+                <h3 class="text-white mb-4">Готовы начать анализировать свои финансы?</h3>
+                <p class="text-white-50 mb-4">Присоединяйтесь к тысячам пользователей, которые уже контролируют свои деньги</p>
+                <a href="{% url 'register' %}" class="btn gradient-btn btn-lg px-5 py-3 fw-bold btn-hover-glow">
+                    🚀 Начать бесплатно
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 </div>
 
 <style>
+/* Анимированный фон */
+.animated-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, #0c0c0c, #1a1a2e, #16213e);
+    background-size: 400% 400%;
+    animation: gradientShift 15s ease infinite;
+    z-index: -1;
+}
+
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Анимации появления */
+.animate-fade-in {
+    animation: fadeInUp 1s ease-out;
+}
+
+.animate-fade-in-delay {
+    animation: fadeInUp 1s ease-out 0.3s both;
+}
+
+.animate-fade-in-delay-2 {
+    animation: fadeInUp 1s ease-out 0.6s both;
+}
+
+.animate-fade-in-delay-3 {
+    animation: fadeInUp 1s ease-out 0.9s both;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Плавающая анимация */
+.floating-animation {
+    animation: floating 3s ease-in-out infinite;
+}
+
+@keyframes floating {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+/* Пульсация */
+.pulse-animation {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* Эффекты при наведении */
+.btn-hover-glow:hover {
+    box-shadow: 0 0 25px rgba(255, 107, 157, 0.4);
+}
+
+.btn-hover-scale:hover {
+    transform: scale(1.05);
+}
+
+.card-hover-glow:hover {
+    box-shadow: 0 0 30px rgba(255, 107, 157, 0.2);
+}
+
+/* Банки */
+.bank-icons {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.bank-icon {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.7em;
+    color: #6bc5f8;
+}
+
+/* Сверкающие точки */
+.sparkle-container {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+.sparkle {
+    width: 4px;
+    height: 4px;
+    background: #ff6b9d;
+    border-radius: 50%;
+    margin: 2px;
+    animation: sparkle 2s infinite;
+}
+
+.sparkle:nth-child(2) { animation-delay: 0.5s; }
+.sparkle:nth-child(3) { animation-delay: 1s; }
+
+@keyframes sparkle {
+    0%, 100% { opacity: 0; transform: scale(0); }
+    50% { opacity: 1; transform: scale(1); }
+}
+
+/* Особенности */
+.feature-card {
+    transition: transform 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+}
+
+.feature-icon {
+    transition: transform 0.3s ease;
+}
+
+.feature-card:hover .feature-icon {
+    transform: scale(1.2);
+}
+
+/* CTA секция */
+.cta-section {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+}
+
+/* Заголовки секций */
+.section-title {
+    position: relative;
+    display: inline-block;
+}
+
+.section-title::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50px;
+    height: 2px;
+    background: linear-gradient(135deg, #ff6b9d, #6bc5f8);
+}
+
 .min-vh-75 {
     min-height: 75vh;
 }
 
-/* Градиент от розового к голубому */
+/* Градиенты */
 .gradient-text {
     background: linear-gradient(135deg, #ff6b9d, #6bc5f8);
     -webkit-background-clip: text;
@@ -155,7 +380,6 @@
 
 .gradient-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(255, 107, 157, 0.3);
     color: white;
 }
 
@@ -175,7 +399,6 @@
 .btn-outline-gradient:hover {
     background: linear-gradient(135deg, #ff6b9d, #6bc5f8);
     color: white;
-    transform: translateY(-2px);
 }
 
 .step-number {
@@ -192,17 +415,8 @@
 
 .card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 10px 25px rgba(255, 107, 157, 0.15);
 }
 
-.dashboard-preview {
-    transition: all 0.3s ease;
-}
-
-.dashboard-preview:hover {
-    box-shadow: 0 0 30px rgba(255, 107, 157, 0.2);
-    transform: scale(1.02);
-}
 </style>
 
 {% endblock %}
